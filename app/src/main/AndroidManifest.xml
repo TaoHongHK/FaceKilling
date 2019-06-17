@@ -9,8 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.Index_TwoActivity"></activity>
-        <activity android:name=".activities.Index_OneActivity" />
+        <activity android:name=".fragments.Index_TwoActivity"></activity>
+        <activity android:name=".fragments.Index_OneActivity" />
         <activity android:name=".activities.IndexActivity" />
         <activity android:name=".activities.SignupActivity" />
         <activity android:name=".activities.LoginActivity">

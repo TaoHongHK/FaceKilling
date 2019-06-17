@@ -1,5 +1,6 @@
 package com.example.facekilling.activities;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
@@ -11,17 +12,19 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.example.facekilling.R;
+import com.example.facekilling.fragments.Index_OneActivity;
+import com.example.facekilling.fragments.Index_TwoActivity;
 
 public class IndexActivity extends AppCompatActivity {
 
-    private static final int TAB_COUNT = 4;
+    private static final int TAB_COUNT = 2;
 
     private FragmentTabHost mTabHost;
 
     private int lastChosenTab = -1;
 
-    private int[] selectedTabIcon = {R.drawable.little_fire,R.drawable.little_fire};
-    private int[] unSelectedTabIcon = {R.drawable.little_fire,R.drawable.little_fire};
+    private int[] unSelectedTabIcon = {R.drawable.tab1,R.drawable.tab2};
+    private int[] selectedTabIcon = {R.drawable.tab1_2,R.drawable.little_fire};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +34,7 @@ public class IndexActivity extends AppCompatActivity {
         mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
 
-        mTabHost.addTab(getTabView(R.string.app_name, unSelectedTabIcon[0]), Index_OneActivity.class,new Bundle());
+        mTabHost.addTab(getTabView(R.string.tab_first, unSelectedTabIcon[0]), Index_OneActivity.class,new Bundle());
         mTabHost.addTab(getTabView(R.string.tab_second, unSelectedTabIcon[1]), Index_TwoActivity.class,new Bundle());
         //设置tabs之间的分隔线不显示
         mTabHost.getTabWidget().setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
@@ -51,7 +54,7 @@ public class IndexActivity extends AppCompatActivity {
         TextView tab_title = (TextView) tabbar_item.findViewById(R.id.tab_title);
         ImageView tab_img = (ImageView) tabbar_item.findViewById(R.id.tab_img);
         tab_title.setText(text);
-        tab_title.setTextColor(getResources().getColor(R.color.colorTheme));
+        tab_title.setTextColor(Color.LTGRAY);
         tab_img.setImageDrawable(drawable);
         TabHost.TabSpec spec = mTabHost.newTabSpec(text).setIndicator(tabbar_item);
         return spec;
@@ -73,7 +76,7 @@ public class IndexActivity extends AppCompatActivity {
             ImageView imageView = (ImageView) lastTabView.findViewById(R.id.tab_img);
             TextView textView = (TextView) lastTabView.findViewById(R.id.tab_title);
             imageView.setImageDrawable(getResources().getDrawable(unSelectedTabIcon[lastChosenTab]));
-            textView.setTextColor(getResources().getColor(R.color.colorTheme));
+            textView.setTextColor(Color.LTGRAY);
         }
         View currTabView = tabHost.getCurrentTabView();
         int currTabCount = tabHost.getCurrentTab();

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TopBar">
+        //标题栏颜色
+        <attr name="topBarBackgroundColor" format="color"/>
+        //标题 标题颜色 标题大小 标题是否可见
+        <attr name="title" format="string"/>
+        <attr name="titleTextSize" format="dimension"/>
+        <attr name="titleTextColor" format="color"/>
+        <attr name="titleVisible" format="boolean"/>
+        //左边文本 左边文本颜色 是否可见
+        <attr name="leftText" format="string"/>
+        <attr name="leftTextColor" format="color"/>
+        <attr name="leftTextVisible" format="boolean"/>
+        //左边按钮 左边按钮图片 是否可见
+        <attr name="leftButtIcon" format="reference|color"/>
+        <attr name="leftButtVisible" format="boolean"/>
+        //右边文本 右边文本颜色 是否可见
+        <attr name="rightText" format="string"/>
+        <attr name="rightTextColor" format="color"/>
+        <attr name="rightTextVisible" format="boolean" />
+        //右边按钮 右边按钮图片 是否可见
+        <attr name="rightButtIcon" format="reference|color"/>
+        <attr name="rightButtVisible" format="boolean"/>
+    </declare-styleable>
+</resources>
