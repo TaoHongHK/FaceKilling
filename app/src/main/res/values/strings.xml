@@ -2,4 +2,7 @@
     <string name="app_name">FaceKilling</string>
     <string name="tab_first">测一测</string>
     <string name="tab_second">逗一逗</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

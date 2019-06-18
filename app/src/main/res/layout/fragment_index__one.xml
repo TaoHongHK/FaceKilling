@@ -17,4 +17,10 @@
         app:titleTextColor="#000">
     </com.example.facekilling.customviews.TopBar>
 
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/indexOneViewPager">
+    </android.support.v4.view.ViewPager>
+
 </LinearLayout>

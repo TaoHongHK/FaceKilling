@@ -4,14 +4,14 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
@@ -23,6 +23,7 @@ public class Index_OneActivity extends Fragment {
     private View mView;
     private TopBar topBar;
     private DrawerLayout drawerLayout;
+    private ViewPager viewPager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,8 +34,10 @@ public class Index_OneActivity extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mContext = getActivity();
-        mView = inflater.inflate(R.layout.activity_index__one,container,false);
-        initView();
+        mView = inflater.inflate(R.layout.fragment_index__one,container,false);
+        topBar = (TopBar) mView.findViewById(R.id.indexOneTopBar);
+        drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawerlayout);
+        viewPager = (ViewPager) mView.findViewById(R.id.indexOneViewPager);
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
             public void leftClicked() {
@@ -44,15 +47,20 @@ public class Index_OneActivity extends Fragment {
 
             @Override
             public void rightClicked() {
-                Toast.makeText(getContext(),"FaceKilling",Toast.LENGTH_SHORT).show();
             }
         });
+        viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager()) {
+            @Override
+            public Fragment getItem(int i) {
+                return new MyCamera();
+            }
 
+            @Override
+            public int getCount() {
+                return 1;
+            }
+        });
         return mView;
     }
 
-    public void initView(){
-        topBar = (TopBar) mView.findViewById(R.id.indexOneTopBar);
-        drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawerlayout);
-    }
 }

@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,7 +31,7 @@ public class Index_TwoActivity extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mContext = getActivity();
-        mView = inflater.inflate(R.layout.activity_index__two,container,false);
+        mView = inflater.inflate(R.layout.fragment_index__two,container,false);
         initView();
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
@@ -43,10 +42,8 @@ public class Index_TwoActivity extends Fragment {
 
             @Override
             public void rightClicked() {
-                Toast.makeText(getContext(),"FaceKilling",Toast.LENGTH_SHORT).show();
             }
         });
-
         return mView;
     }
 
