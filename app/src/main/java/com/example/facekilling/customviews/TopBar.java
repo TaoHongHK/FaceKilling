@@ -138,8 +138,12 @@ public class TopBar extends LinearLayout {
         });
 
         tvTitle.setText(title);
-        tvTitle.setTextColor(titleTextColor);
-        tvTitle.setTextSize(titleTextSize);
+        if(0 != titleTextColor){
+            tvTitle.setTextColor(titleTextColor);
+        }
+        if(0 != titleTextSize){
+            tvTitle.setTextSize(titleTextSize);
+        }
         tvTitle.setGravity(Gravity.CENTER);
         if(!titleVisible){
             tvTitle.setVisibility(GONE);

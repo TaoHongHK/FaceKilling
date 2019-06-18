@@ -4,8 +4,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ public class Index_TwoActivity extends Fragment {
     private Context mContext;
     private View mView;
     private TopBar topBar;
+    private DrawerLayout drawerLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class Index_TwoActivity extends Fragment {
             @Override
             public void leftClicked() {
                 Toast.makeText(getContext(),"FaceKilling",Toast.LENGTH_SHORT).show();
+                drawerLayout.openDrawer(Gravity.START);
             }
 
             @Override
@@ -48,5 +52,6 @@ public class Index_TwoActivity extends Fragment {
 
     public void initView(){
         topBar = (TopBar) mView.findViewById(R.id.indexTwoTopBar);
+        drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawerlayout);
     }
 }

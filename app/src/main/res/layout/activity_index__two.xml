@@ -11,11 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/FaceKillingTopBarHeight"
         android:id="@+id/indexTwoTopBar"
-        app:topBarBackgroundColor="#FFF"
-        app:leftButtIcon="@drawable/back"
+        app:topBarBackgroundColor="@color/colorTheme"
+        app:leftButtIcon="@drawable/menu"
         app:title="@string/tab_second"
-        app:titleTextColor="#000"
-        app:titleTextSize="10sp">
+        app:titleTextColor="#000">
     </com.example.facekilling.customviews.TopBar>
 
 </LinearLayout>

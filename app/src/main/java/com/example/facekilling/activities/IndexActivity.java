@@ -2,9 +2,13 @@ package com.example.facekilling.activities;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,17 +23,28 @@ public class IndexActivity extends AppCompatActivity {
 
     private static final int TAB_COUNT = 2;
 
+    private DrawerLayout drawerLayout;
     private FragmentTabHost mTabHost;
 
     private int lastChosenTab = -1;
 
-    private int[] unSelectedTabIcon = {R.drawable.tab1,R.drawable.tab2};
-    private int[] selectedTabIcon = {R.drawable.tab1_2,R.drawable.little_fire};
+    private int[] unSelectedTabIcon = {R.drawable.pkgrey,R.drawable.testgrey};
+    private int[] selectedTabIcon = {R.drawable.pkcolor,R.drawable.testcolor};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_index);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
 
         mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
