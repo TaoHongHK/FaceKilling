@@ -53,7 +53,6 @@ public class TopBar extends LinearLayout {
     public TopBar(Context context, AttributeSet attrs){
         super(context, (AttributeSet) attrs);
         initView(attrs);
-        this.bringToFront();
     }
 
     public void initView(AttributeSet attrs){
@@ -80,7 +79,7 @@ public class TopBar extends LinearLayout {
         rightTextVisible = typedArray.getBoolean(R.styleable.TopBar_rightTextVisible,false);
 
         //右边按钮
-        rightButtIcon = typedArray.getResourceId(R.styleable.TopBar_leftButtIcon,-1);
+        rightButtIcon = typedArray.getResourceId(R.styleable.TopBar_rightButtIcon,-1);
         rightButtVisible = typedArray.getBoolean(R.styleable.TopBar_rightButtVisible,false);
 
         //中间标题
@@ -154,7 +153,9 @@ public class TopBar extends LinearLayout {
 
         setBackgroundColor(backgroundColor);
 
-        addView(topBarLayout,0);
+        addView(topBarLayout);
+
+        this.bringToFront();
 
     }
 

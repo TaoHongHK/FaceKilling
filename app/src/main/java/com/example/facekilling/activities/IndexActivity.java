@@ -1,5 +1,7 @@
 package com.example.facekilling.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -14,10 +16,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.facekilling.R;
 import com.example.facekilling.fragments.Index_OneActivity;
+import com.example.facekilling.fragments.Index_ThreeActivity;
 import com.example.facekilling.fragments.Index_TwoActivity;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class IndexActivity extends AppCompatActivity {
 
@@ -28,29 +34,30 @@ public class IndexActivity extends AppCompatActivity {
 
     private int lastChosenTab = -1;
 
-    private int[] unSelectedTabIcon = {R.drawable.pkgrey,R.drawable.testgrey};
-    private int[] selectedTabIcon = {R.drawable.pkcolor,R.drawable.testcolor};
+    private int[] unSelectedTabIcon = {R.drawable.pkgrey,R.drawable.haoyougrey,R.drawable.frigrey};
+    private int[] selectedTabIcon = {R.drawable.pkcolor,R.drawable.haoyoucolor,R.drawable.fricolor};
+
+    private static Context context;
+    public static Context getContext() {
+        return context;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_index);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                drawerLayout.closeDrawers();
-                return true;
-            }
-        });
+        context = getApplicationContext();
+
+        //侧边栏监控
+        monitorSidebar();
 
         mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
 
         mTabHost.addTab(getTabView(R.string.tab_first, unSelectedTabIcon[0]), Index_OneActivity.class,new Bundle());
         mTabHost.addTab(getTabView(R.string.tab_second, unSelectedTabIcon[1]), Index_TwoActivity.class,new Bundle());
+        mTabHost.addTab(getTabView(R.string.tab_third,unSelectedTabIcon[2]), Index_ThreeActivity.class,new Bundle());
         //设置tabs之间的分隔线不显示
         mTabHost.getTabWidget().setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
         mTabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
@@ -101,4 +108,61 @@ public class IndexActivity extends AppCompatActivity {
         textView.setTextColor(getResources().getColor(R.color.colorTheme));
         lastChosenTab = currTabCount;
     }
+
+    public void monitorSidebar(){
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
+        //监控侧边栏头像
+        View navHeaderView = navigationView.getHeaderView(0);
+        CircleImageView cirIViewHead = (CircleImageView) navHeaderView.findViewById(R.id.avatar_img);
+        cirIViewHead.setOnClickListener(new View.OnClickListener() {
+            @Override
+
+            public void onClick(View view) {
+                Toast.makeText(getContext(),"Head",Toast.LENGTH_SHORT).show();
+            }
+        });
+        //监控侧边栏菜单
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch(menuItem.getItemId()){
+                    case R.id.nav_profile:
+                        Toast.makeText(getContext(),"click the profile",Toast.LENGTH_SHORT).show();
+                        drawerLayout.closeDrawers();
+                        break;
+                    case R.id.nav_mail:
+                        Toast.makeText(getContext(),"click the mail",Toast.LENGTH_SHORT).show();
+                        drawerLayout.closeDrawers();
+                        break;
+                    case R.id.nav_settings:
+                        Toast.makeText(getContext(),"click the setting",Toast.LENGTH_SHORT).show();
+                        drawerLayout.closeDrawers();
+                        break;
+                    case R.id.nav_pictures:
+                        Toast.makeText(getContext(),"click the pictures", Toast.LENGTH_SHORT).show();
+                        drawerLayout.closeDrawers();
+                        enterPictures();
+                        break;
+                    default:
+                        drawerLayout.closeDrawers();
+                }
+                return true;
+            }
+        });
+    }
+
+    //进入图库
+    protected void enterPictures(){
+        Intent intent = new Intent(getContext(), PicturesActivity.class);
+        startActivity(intent);
+    }
+
 }

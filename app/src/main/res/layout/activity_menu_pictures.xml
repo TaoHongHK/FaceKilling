@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:app = "http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:orientation="vertical"
+    android:layout_width = "match_parent"
+    android:layout_height="match_parent">
+
+
+    <com.example.facekilling.customviews.TopBar
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/FaceKillingTopBarHeight"
+        android:id="@+id/menuPicturesTopBar"
+        app:topBarBackgroundColor="@color/colorTheme"
+        app:leftButtIcon="@drawable/back"
+        app:rightButtIcon="@drawable/picture_menu"
+        app:rightButtVisible="true"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="@string/menu_pictures_name"
+        app:titleTextColor="#000">
+    </com.example.facekilling.customviews.TopBar>
+
+
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/pictures_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </android.support.design.widget.CoordinatorLayout>
+</LinearLayout>

@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.facekilling.activities.PicturesActivity">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_profile"
+            android:id="@+id/picture_profile"
             android:icon="@drawable/personal_menu"
             android:title="profile" />
         <item
-            android:id="@+id/nav_mail"
+            android:id="@+id/picture_mail"
             android:icon="@drawable/mail_menu"
             android:title="mail" />
         <item
-            android:id="@+id/nav_settings"
+            android:id="@+id/picture_settings"
             android:icon="@drawable/settings_menu"
             android:title="settings" />
         <item
-            android:id="@+id/nav_pictures"
+            android:id="@+id/picture_pictures"
             android:icon="@drawable/pictures_menu"
             android:title="pictures" />
     </group>
