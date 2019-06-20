@@ -165,4 +165,20 @@ public class TopBar extends LinearLayout {
         }
         else button.setVisibility(View.GONE);
     }
+
+    public Button getLeftButt(){
+        return leftButt;
+    }
+
+    public Button getRightButt(){
+        return rightButt;
+    }
+
+    public TextView getLeftTextView(){
+        return leftTv;
+    }
+
+    public TextView getRightTextView(){
+        return rightButt;
+    }
 }

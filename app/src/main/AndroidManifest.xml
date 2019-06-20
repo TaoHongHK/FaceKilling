@@ -16,6 +16,9 @@
         android:theme="@style/AppTheme">
         <activity android:name=".activities.IndexActivity" />
         <activity android:name=".activities.SignupActivity" />
+        <activity android:name=".activities.PicturesActivity"/>
+        <activity android:name=".activities.BiaoQingBaoCameraActivity"/>
+        <activity android:name=".activities.YanZhiCameraActivity"/>
         <activity android:name=".activities.LoginActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -3,4 +3,5 @@
     <dimen name="FaceKillingTopBarHeight">50dp</dimen>
     <dimen name="FaceKillingTabBarHeight">50dp</dimen>
     <dimen name="ViewPagerTopBarHeight">30dp</dimen>
+    <dimen name="cof_head_size">50dp</dimen>
 </resources>

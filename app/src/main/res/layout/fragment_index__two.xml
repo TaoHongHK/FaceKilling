@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.Index_TwoActivity"
+    tools:context=".fragments.Index_TwoFragment"
     android:orientation="vertical">
 
     <com.example.facekilling.customviews.TopBar

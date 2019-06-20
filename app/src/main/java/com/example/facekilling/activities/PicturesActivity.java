@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
@@ -34,6 +35,7 @@ public class PicturesActivity extends AppCompatActivity {
     protected  DrawerLayout drawerLayout;
 
     private DrawerLayout mDrawerLayout;
+
     private static Context context;
 
     private Picture[] pictures = {
@@ -64,7 +66,10 @@ public class PicturesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_pictures);
         context = getApplicationContext();
+        initView();
+    }
 
+    public void initView(){
         topBar = (TopBar) findViewById(R.id.menuPicturesTopBar);
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
@@ -75,41 +80,49 @@ public class PicturesActivity extends AppCompatActivity {
 
             @Override
             public void rightClicked() {
-
+                createPopMenu();
             }
         });
-
         initPictures();
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.pictures_recycler_view);
         GridLayoutManager layoutManger = new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(layoutManger);
         adapter = new PictureAdapater(picturesList);
         recyclerView.setAdapter(adapter);
+
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.picture_menu, menu);
+    public boolean createPopMenu() {
+        PopupMenu popupMenu = new PopupMenu(getContext(),topBar.getRightButt());
+        popupMenu.getMenuInflater().inflate(R.menu.picture_menu,popupMenu.getMenu());
+        popupMenu.show();
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                onPopItemSelected(item);
+                return false;
+            }
+        });
         return true;
     }
 
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+    public void onPopItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
             case R.id.picture_profile:
-                Toast.makeText(getContext(),"click the profile",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "click the profile", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.picture_mail:
-                Toast.makeText(getContext(),"click the mail",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "click the mail", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.picture_settings:
-                Toast.makeText(getContext(),"click the setting",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "click the setting", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.picture_pictures:
-                Toast.makeText(getContext(),"click the pictures",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "click the pictures", Toast.LENGTH_SHORT).show();
                 break;
             default:
         }
-        return super.onOptionsItemSelected(item);
     }
 
     private void initPictures(){

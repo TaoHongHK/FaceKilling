@@ -1,17 +1,23 @@
-package com.example.facekilling.fragments;
+package com.example.facekilling.activities;
 
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -22,58 +28,55 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
+import com.example.facekilling.util.GetSysTime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 
-public class YanZhiCamera extends Fragment {
+public class BiaoQingBaoCameraActivity extends Activity {
 
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
     private ImageView iv_show;
     private int viewWidth, viewHeight;
-    private View mView;
     private int frontCameraId;
     private int backCameraId;
     private int numberOfCameras;
     private int usingCamera;
     private Button takePicButt;
+    private Button flipCamera;
 
 
-    public YanZhiCamera() {
+    public BiaoQingBaoCameraActivity() {
         // Required empty public constructor
     }
 
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_yanzhi_camera, container, false);
+        setContentView(R.layout.fragment_biaoqingbao_camera);
         initView();
-        return mView;
     }
 
     private void initView() {
-        iv_show = (ImageView) mView.findViewById(R.id.yz_iv_show_camera);
-        takePicButt = (Button) mView.findViewById(R.id.yz_takePicButt);
-        //mSurfaceView
-        mSurfaceView = (SurfaceView) mView.findViewById(R.id.yz_surface_view_camera);
+        iv_show = (ImageView) findViewById(R.id.bqb_iv_show_camera);
+        takePicButt = (Button) findViewById(R.id.bqb_takePicButt);
+        flipCamera = (Button) findViewById(R.id.bqb_flipCamera);
+        initCameraInfo();
+        mSurfaceView = (SurfaceView) findViewById(R.id.bqb_surface_view_camera);
         mSurfaceHolder = mSurfaceView.getHolder();
-        // mSurfaceView 不需要自己的缓冲区
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        // mSurfaceView添加回调
         mSurfaceHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) { //SurfaceView创建
                 // 初始化Camera
-                initCamera();
+                initFrontCamera();
             }
 
             @Override
@@ -84,9 +87,7 @@ public class YanZhiCamera extends Fragment {
             public void surfaceDestroyed(SurfaceHolder holder) { //SurfaceView销毁
                 // 释放Camera资源
                 if (mCamera != null) {
-                    mCamera.stopPreview();
-                    mCamera.release();
-                    mCamera = null;
+                    stopCamera();
                 }
             }
         });
@@ -97,22 +98,25 @@ public class YanZhiCamera extends Fragment {
                 if (mCamera == null) return;
                 //自动对焦后拍照
                 //mCamera.autoFocus(autoFocusCallback);
-
                 mCamera.autoFocus(new Camera.AutoFocusCallback() {
                     @Override
                     public void onAutoFocus(boolean success, Camera camera) {
-                        if (success){
-                            Toast.makeText(getContext(),"聚焦",Toast.LENGTH_SHORT).show();
-                        }
+                        Toast.makeText(getApplicationContext(),"聚焦",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
-
         takePicButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 takePicture();
+            }
+        });
+
+        flipCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeCamera();
             }
         });
     }
@@ -133,22 +137,14 @@ public class YanZhiCamera extends Fragment {
         }
     }
 
-    /**
-     * SurfaceHolder 回调接口方法
-     */
-    private void initCamera() {
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+    private void initFrontCamera() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
         } else {
-            ActivityCompat.requestPermissions(getActivity(),
+            ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA}, 1);
         }
-        initCameraInfo();
-        cameraChanging(frontCameraId);
-    }
-
-    public void cameraChanging(int cameraId){
-        mCamera = Camera.open(cameraId);//默认开启后置
+        mCamera = Camera.open(frontCameraId);//默认开启后置
         mCamera.setDisplayOrientation(90);//摄像头进行旋转90°
         if (mCamera != null) {
             try {
@@ -171,18 +167,59 @@ public class YanZhiCamera extends Fragment {
                 e.printStackTrace();
             }
         }
+        usingCamera = frontCameraId;
+    }
+
+    private void initBackCamera() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA}, 1);
+        }
+        mCamera = Camera.open(backCameraId);//默认开启后置
+        mCamera.setDisplayOrientation(270);//摄像头进行旋转90°
+        if (mCamera != null) {
+            try {
+                Camera.Parameters parameters = mCamera.getParameters();
+                //设置预览照片的大小
+                parameters.setPreviewFpsRange(viewWidth, viewHeight);
+                //设置相机预览照片帧数
+                parameters.setPreviewFpsRange(4, 10);
+                //设置图片格式
+                parameters.setPictureFormat(ImageFormat.JPEG);
+                //设置图片的质量
+                parameters.set("jpeg-quality", 90);
+                //设置照片的大小
+                parameters.setPictureSize(viewWidth, viewHeight);
+                //通过SurfaceView显示预览
+                mCamera.setPreviewDisplay(mSurfaceHolder);
+                //开始预览
+                mCamera.startPreview();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        usingCamera = frontCameraId;
+    }
+
+    public void stopCamera(){
+        if(mCamera!=null){
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
     }
 
     public void changeCamera(){
         if (usingCamera==frontCameraId){
-            cameraChanging(backCameraId);
-            usingCamera = backCameraId;
+            stopCamera();
+            initBackCamera();
         }else {
-            cameraChanging(frontCameraId);
-            usingCamera = frontCameraId;
+            stopCamera();
+            initFrontCamera();
         }
     }
-
 
     public void takePicture(){
         if (mCamera==null){
@@ -203,47 +240,49 @@ public class YanZhiCamera extends Fragment {
         }
     }
 
-    /**
-     * 自动对焦 对焦成功后 就进行拍照
-     */
-    /*Camera.AutoFocusCallback autoFocusCallback = new Camera.AutoFocusCallback() {
-        @Override
-        public void onAutoFocus(boolean success, Camera camera) {
-            if (success) {//对焦成功
-
-                camera.takePicture(new Camera.ShutterCallback() {//按下快门
-                    @Override
-                    public void onShutter() {
-                        //按下快门瞬间的操作
-                    }
-                }, new Camera.PictureCallback() {
-                    @Override
-                    public void onPictureTaken(byte[] data, Camera camera) {//是否保存原始图片的信息
-
-                    }
-                }, pictureCallback);
-            }
-        }
-    };*/
-    /**
-     * 获取图片
-     */
     Camera.PictureCallback pictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
             final Bitmap resource = BitmapFactory.decodeByteArray(data, 0, data.length);
             if (resource == null) {
-                Toast.makeText(getContext(), "拍照失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "拍照失败", Toast.LENGTH_SHORT).show();
             }
             final Matrix matrix = new Matrix();
-            matrix.setRotate(90);
+            matrix.setRotate(-90);
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null && iv_show != null && iv_show.getVisibility() == View.GONE) {
                 mCamera.stopPreview();
                 iv_show.setVisibility(View.VISIBLE);
                 mSurfaceView.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "拍照", Toast.LENGTH_SHORT).show();
                 iv_show.setImageBitmap(bitmap);
+            }
+            String sdStatus = Environment.getExternalStorageState();
+            if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+                return;
+            }
+            Log.d("cameraMMMM", "onPictureTaken: ");
+            FileOutputStream fileOutputStream = null;
+            String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"FaceK/Camera/";
+            File file = new File(filePath);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            String fileName = filePath + "/" + GetSysTime.getCurrTime() +".jpg";
+            try {
+                fileOutputStream = new FileOutputStream(fileName);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);// 把数据写入文件
+                MediaStore.Images.Media.insertImage(getContentResolver(), fileName, "title", "description");
+                Uri uri = Uri.fromFile(file);
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };

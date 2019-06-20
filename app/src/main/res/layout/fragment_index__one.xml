@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.Index_OneActivity"
+    tools:context=".fragments.Index_OneFragment"
     android:orientation="vertical">
 
     <com.example.facekilling.customviews.TopBar
@@ -19,30 +19,17 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ViewPagerTopBarHeight"
-        android:orientation="horizontal">
-        <TextView
-            android:id="@+id/viewpager_oneTv"
-            android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/click_img"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/viewpager_one"
-            android:textAlignment="center"
-            android:paddingTop="5dp"/>
-        <TextView
-            android:id="@+id/viewpager_twoTv"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/viewpager_two"
-            android:textAlignment="center"
-            android:paddingTop="5dp"/>
+            android:src="@drawable/indeximg"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"/>
+
     </LinearLayout>
 
-    <android.support.v4.view.ViewPager
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/indexOneViewPager">
-    </android.support.v4.view.ViewPager>
 
 </LinearLayout>

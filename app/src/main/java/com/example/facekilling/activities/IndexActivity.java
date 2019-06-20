@@ -19,9 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
-import com.example.facekilling.fragments.Index_OneActivity;
-import com.example.facekilling.fragments.Index_ThreeActivity;
-import com.example.facekilling.fragments.Index_TwoActivity;
+import com.example.facekilling.fragments.Index_OneFragment;
+import com.example.facekilling.fragments.Index_ThreeFragment;
+import com.example.facekilling.fragments.Index_TwoFragment;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -55,9 +55,9 @@ public class IndexActivity extends AppCompatActivity {
         mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
 
-        mTabHost.addTab(getTabView(R.string.tab_first, unSelectedTabIcon[0]), Index_OneActivity.class,new Bundle());
-        mTabHost.addTab(getTabView(R.string.tab_second, unSelectedTabIcon[1]), Index_TwoActivity.class,new Bundle());
-        mTabHost.addTab(getTabView(R.string.tab_third,unSelectedTabIcon[2]), Index_ThreeActivity.class,new Bundle());
+        mTabHost.addTab(getTabView(R.string.tab_first, unSelectedTabIcon[0]), Index_OneFragment.class,new Bundle());
+        mTabHost.addTab(getTabView(R.string.tab_second, unSelectedTabIcon[1]), Index_TwoFragment.class,new Bundle());
+        mTabHost.addTab(getTabView(R.string.tab_third,unSelectedTabIcon[2]), Index_ThreeFragment.class,new Bundle());
         //设置tabs之间的分隔线不显示
         mTabHost.getTabWidget().setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
         mTabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
