@@ -18,18 +18,21 @@
         android:scaleType="centerCrop" />
 
     <Button
-        android:id="@+id/bqb_takePicButt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="表情包拍照"
+        android:id="@+id/bqb_take_pic_butt"
+        android:layout_width="@dimen/camera_butt_size"
+        android:layout_height="@dimen/camera_butt_size"
+        android:background="@drawable/shape_button"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"/>
 
     <Button
-        android:id="@+id/bqb_flipCamera"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="FlipCamera"
+        android:id="@+id/bqb_flip_camera"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/camera"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp" />
 </RelativeLayout>

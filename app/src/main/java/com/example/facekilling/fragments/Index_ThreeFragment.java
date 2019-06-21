@@ -68,7 +68,6 @@ public class Index_ThreeFragment extends Fragment {
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
             public void leftClicked() {
-                Toast.makeText(getContext(),"FaceKilling",Toast.LENGTH_SHORT).show();
                 drawerLayout.openDrawer(Gravity.START);
             }
 

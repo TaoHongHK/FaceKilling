@@ -47,7 +47,6 @@ public class Index_OneFragment extends Fragment {
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
             public void leftClicked() {
-                Toast.makeText(getContext(),"FaceKilling",Toast.LENGTH_SHORT).show();
                 drawerLayout.openDrawer(Gravity.START);
             }
 

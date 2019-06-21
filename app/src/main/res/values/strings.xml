@@ -3,7 +3,7 @@
     <string name="tab_first">FaceK</string>
     <string name="tab_second">好友</string>
     <string name="tab_third">朋友圈</string>
-    <string name="viewpager_one">测一测</string>
-    <string name="viewpager_two">斗一斗</string>
+    <string name="viewpager_one">好友</string>
+    <string name="viewpager_two">消息</string>
     <string name="menu_pictures_name">pictures</string>
 </resources>

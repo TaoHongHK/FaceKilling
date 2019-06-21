@@ -15,14 +15,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -49,6 +46,7 @@ public class BiaoQingBaoCameraActivity extends Activity {
     private int usingCamera;
     private Button takePicButt;
     private Button flipCamera;
+    private boolean isCameraing;
 
 
     public BiaoQingBaoCameraActivity() {
@@ -66,9 +64,10 @@ public class BiaoQingBaoCameraActivity extends Activity {
 
     private void initView() {
         iv_show = (ImageView) findViewById(R.id.bqb_iv_show_camera);
-        takePicButt = (Button) findViewById(R.id.bqb_takePicButt);
-        flipCamera = (Button) findViewById(R.id.bqb_flipCamera);
+        takePicButt = (Button) findViewById(R.id.bqb_take_pic_butt);
+        flipCamera = (Button) findViewById(R.id.bqb_flip_camera);
         initCameraInfo();
+        askForPermission();
         mSurfaceView = (SurfaceView) findViewById(R.id.bqb_surface_view_camera);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -77,6 +76,7 @@ public class BiaoQingBaoCameraActivity extends Activity {
             public void surfaceCreated(SurfaceHolder holder) { //SurfaceView创建
                 // 初始化Camera
                 initFrontCamera();
+                isCameraing = true;
             }
 
             @Override
@@ -138,12 +138,6 @@ public class BiaoQingBaoCameraActivity extends Activity {
     }
 
     private void initFrontCamera() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA}, 1);
-        }
         mCamera = Camera.open(frontCameraId);//默认开启后置
         mCamera.setDisplayOrientation(90);//摄像头进行旋转90°
         if (mCamera != null) {
@@ -171,12 +165,6 @@ public class BiaoQingBaoCameraActivity extends Activity {
     }
 
     private void initBackCamera() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA}, 1);
-        }
         mCamera = Camera.open(backCameraId);//默认开启后置
         mCamera.setDisplayOrientation(270);//摄像头进行旋转90°
         if (mCamera != null) {
@@ -252,38 +240,96 @@ public class BiaoQingBaoCameraActivity extends Activity {
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null && iv_show != null && iv_show.getVisibility() == View.GONE) {
                 mCamera.stopPreview();
-                iv_show.setVisibility(View.VISIBLE);
-                mSurfaceView.setVisibility(View.GONE);
+                changeShowingViews(isCameraing);
                 iv_show.setImageBitmap(bitmap);
             }
-            String sdStatus = Environment.getExternalStorageState();
-            if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
-                return;
-            }
-            Log.d("cameraMMMM", "onPictureTaken: ");
-            FileOutputStream fileOutputStream = null;
-            String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"FaceK/Camera/";
-            File file = new File(filePath);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            String fileName = filePath + "/" + GetSysTime.getCurrTime() +".jpg";
-            try {
-                fileOutputStream = new FileOutputStream(fileName);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);// 把数据写入文件
-                MediaStore.Images.Media.insertImage(getContentResolver(), fileName, "title", "description");
-                Uri uri = Uri.fromFile(file);
-                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    fileOutputStream.flush();
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    savePic(bitmap);
                 }
-            }
+            }).start();
         }
     };
+
+    public void savePic(Bitmap bitmap){
+        String sdStatus = Environment.getExternalStorageState();
+        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+            return;
+        }
+        FileOutputStream fileOutputStream = null;
+        String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+"Camera";
+        File baseFile = new File(baseFilePath);
+        if (!baseFile.exists()) {
+            baseFile.mkdirs();
+            Log.d("cameraMMMMM","file created");
+        }
+        String pickName = GetSysTime.getCurrTime() +".jpg";
+        Log.d("cameraMMMMM",pickName);
+        try {
+            File picFile = new File(baseFile,pickName);
+            fileOutputStream = new FileOutputStream(picFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+            MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
+            Uri uri = Uri.fromFile(picFile);
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fileOutputStream.flush();
+                fileOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }catch (NullPointerException ne){
+                ne.printStackTrace();
+            }
+        }
+    }
+
+    public Activity getActivity(){
+        return this;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (iv_show.getVisibility()==View.GONE){
+            super.onBackPressed();
+        }else {
+            changeShowingViews(isCameraing);
+            isCameraing = !isCameraing;
+            mCamera.startPreview();
+        }
+    }
+
+    public void askForPermission(){
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA}, 1);
+        }
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+        }
+    }
+
+    public void changeShowingViews(boolean cameraing){
+        if (cameraing){
+            mSurfaceView.setVisibility(View.GONE);
+            flipCamera.setVisibility(View.GONE);
+            takePicButt.setVisibility(View.GONE);
+            iv_show.setVisibility(View.VISIBLE);
+        }else{
+            mSurfaceView.setVisibility(View.VISIBLE);
+            flipCamera.setVisibility(View.VISIBLE);
+            takePicButt.setVisibility(View.VISIBLE);
+            iv_show.setVisibility(View.GONE);
+        }
+        isCameraing = !isCameraing;
+    }
 }

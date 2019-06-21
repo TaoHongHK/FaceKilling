@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <size
+        android:height="@dimen/camera_butt_size"
+        android:width="@dimen/camera_butt_size" />
+
+    <corners
+        android:radius="@dimen/half_camera_butt_size"/>
+
+    <gradient
+        android:startColor="#DE2626"
+        android:endColor="#7DE3E2"
+        android:angle="45"/>
+
+    <stroke
+        android:width="2dp"
+        android:color="@android:color/white"
+        android:dashWidth="0dp" />
+
+</shape>

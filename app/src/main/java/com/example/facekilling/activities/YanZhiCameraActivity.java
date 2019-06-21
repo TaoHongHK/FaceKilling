@@ -3,27 +3,33 @@ package com.example.facekilling.activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
+import com.example.facekilling.util.GetSysTime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 
@@ -40,6 +46,7 @@ public class YanZhiCameraActivity extends Activity {
     private int usingCamera;
     private Button takePicButt;
     private Button flipCamera;
+    private boolean isCameraing;
 
 
     public YanZhiCameraActivity() {
@@ -72,12 +79,6 @@ public class YanZhiCameraActivity extends Activity {
     }
 
     private void initFrontCamera() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA}, 1);
-        }
         mCamera = Camera.open(frontCameraId);//默认开启后置
         mCamera.setDisplayOrientation(90);//摄像头进行旋转90°
         if (mCamera != null) {
@@ -105,12 +106,6 @@ public class YanZhiCameraActivity extends Activity {
     }
 
     private void initBackCamera() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA}, 1);
-        }
         mCamera = Camera.open(backCameraId);//默认开启后置
         mCamera.setDisplayOrientation(270);//摄像头进行旋转90°
         if (mCamera != null) {
@@ -147,9 +142,10 @@ public class YanZhiCameraActivity extends Activity {
 
     private void initView() {
         iv_show = (ImageView) findViewById(R.id.yz_iv_show_camera);
-        takePicButt = (Button) findViewById(R.id.yz_takePicButt);
-        flipCamera = (Button) findViewById(R.id.yz_flipCamera);
+        takePicButt = (Button) findViewById(R.id.yz_take_pic_butt);
+        flipCamera = (Button) findViewById(R.id.yz_flip_camera);
         initCameraInfo();
+        askForPermission();
         mSurfaceView = (SurfaceView) findViewById(R.id.yz_surface_view_camera);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -157,6 +153,7 @@ public class YanZhiCameraActivity extends Activity {
             @Override
             public void surfaceCreated(SurfaceHolder holder) { //SurfaceView创建
                 initFrontCamera();
+                isCameraing = true;
             }
 
             @Override
@@ -242,10 +239,96 @@ public class YanZhiCameraActivity extends Activity {
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null && iv_show != null && iv_show.getVisibility() == View.GONE) {
                 mCamera.stopPreview();
-                iv_show.setVisibility(View.VISIBLE);
-                mSurfaceView.setVisibility(View.GONE);
+                changeShowingViews(isCameraing);
                 iv_show.setImageBitmap(bitmap);
             }
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    savePic(bitmap);
+                }
+            }).start();
         }
     };
+
+    public void savePic(Bitmap bitmap){
+        String sdStatus = Environment.getExternalStorageState();
+        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+            return;
+        }
+        FileOutputStream fileOutputStream = null;
+        String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+"Camera";
+        File baseFile = new File(baseFilePath);
+        if (!baseFile.exists()) {
+            baseFile.mkdirs();
+            Log.d("cameraMMMMM","file created");
+        }
+        String pickName = GetSysTime.getCurrTime() +".jpg";
+        Log.d("cameraMMMMM",pickName);
+        try {
+            File picFile = new File(baseFile,pickName);
+            fileOutputStream = new FileOutputStream(picFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+            MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
+            Uri uri = Uri.fromFile(picFile);
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fileOutputStream.flush();
+                fileOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }catch (NullPointerException ne){
+                ne.printStackTrace();
+            }
+        }
+    }
+
+    public Activity getActivity(){
+        return this;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (iv_show.getVisibility()==View.GONE){
+            super.onBackPressed();
+        }else {
+            changeShowingViews(isCameraing);
+            mCamera.startPreview();
+        }
+    }
+
+    public void askForPermission(){
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA}, 1);
+        }
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+        }
+    }
+
+    public void changeShowingViews(boolean cameraing){
+        if (cameraing){
+            mSurfaceView.setVisibility(View.GONE);
+            flipCamera.setVisibility(View.GONE);
+            takePicButt.setVisibility(View.GONE);
+            iv_show.setVisibility(View.VISIBLE);
+        }else{
+            mSurfaceView.setVisibility(View.VISIBLE);
+            flipCamera.setVisibility(View.VISIBLE);
+            takePicButt.setVisibility(View.VISIBLE);
+            iv_show.setVisibility(View.GONE);
+        }
+        isCameraing = !isCameraing;
+    }
 }

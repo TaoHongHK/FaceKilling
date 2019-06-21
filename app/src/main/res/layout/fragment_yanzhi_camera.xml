@@ -16,17 +16,22 @@
         android:scaleType="centerCrop" />
 
     <Button
-        android:id="@+id/yz_takePicButt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="颜值拍照"
+        android:id="@+id/yz_take_pic_butt"
+        android:layout_width="@dimen/camera_butt_size"
+        android:layout_height="@dimen/camera_butt_size"
+        android:background="@drawable/shape_button"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"/>
 
     <Button
-        android:id="@+id/yz_flipCamera"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="flipCamera"/>
+        android:id="@+id/yz_flip_camera"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/camera"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
 
 </RelativeLayout>

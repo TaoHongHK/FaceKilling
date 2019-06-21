@@ -2,6 +2,8 @@
 <resources>
     <dimen name="FaceKillingTopBarHeight">50dp</dimen>
     <dimen name="FaceKillingTabBarHeight">50dp</dimen>
-    <dimen name="ViewPagerTopBarHeight">30dp</dimen>
+    <dimen name="ViewPagerTopBarHeight">40dp</dimen>
     <dimen name="cof_head_size">50dp</dimen>
+    <dimen name="camera_butt_size">70dp</dimen>
+    <dimen name="half_camera_butt_size">35dp</dimen>
 </resources>
