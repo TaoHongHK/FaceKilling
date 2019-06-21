@@ -82,8 +82,9 @@ public class Index_ThreeFragment extends Fragment {
         initCofs();
         RecyclerView recyclerView = (RecyclerView) mView.findViewById(R.id.cof_recycler_view);
         GridLayoutManager layoutManger = new GridLayoutManager(getActivity(),1);
+        layoutManger.setAutoMeasureEnabled(true);
         recyclerView.setLayoutManager(layoutManger);
-        cofadapter = new CofAdapter(cofList);
+        cofadapter = new CofAdapter(getActivity(),cofList);
         recyclerView.setAdapter(cofadapter);
 
         //下拉刷新
