@@ -188,7 +188,7 @@ public class BiaoQingBaoCameraActivity extends Activity {
                 e.printStackTrace();
             }
         }
-        usingCamera = frontCameraId;
+        usingCamera = backCameraId;
     }
 
     public void stopCamera(){
@@ -243,48 +243,48 @@ public class BiaoQingBaoCameraActivity extends Activity {
                 changeShowingViews(isCameraing);
                 iv_show.setImageBitmap(bitmap);
             }
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    savePic(bitmap);
-                }
-            }).start();
+            savePic(bitmap);
         }
     };
 
-    public void savePic(Bitmap bitmap){
-        String sdStatus = Environment.getExternalStorageState();
-        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
-            return;
-        }
-        FileOutputStream fileOutputStream = null;
-        String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+"Camera";
-        File baseFile = new File(baseFilePath);
-        if (!baseFile.exists()) {
-            baseFile.mkdirs();
-            Log.d("cameraMMMMM","file created");
-        }
-        String pickName = GetSysTime.getCurrTime() +".jpg";
-        Log.d("cameraMMMMM",pickName);
-        try {
-            File picFile = new File(baseFile,pickName);
-            fileOutputStream = new FileOutputStream(picFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-            MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
-            Uri uri = Uri.fromFile(picFile);
-            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                fileOutputStream.flush();
-                fileOutputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }catch (NullPointerException ne){
-                ne.printStackTrace();
+    public void savePic(final Bitmap bitmap){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String sdStatus = Environment.getExternalStorageState();
+                if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+                    return;
+                }
+                FileOutputStream fileOutputStream = null;
+                String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+"Camera";
+                File baseFile = new File(baseFilePath);
+                if (!baseFile.exists()) {
+                    baseFile.mkdirs();
+                    Log.d("cameraMMMMM","file created");
+                }
+                String pickName = GetSysTime.getCurrTime() +".jpg";
+                Log.d("cameraMMMMM",pickName);
+                try {
+                    File picFile = new File(baseFile,pickName);
+                    fileOutputStream = new FileOutputStream(picFile);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
+                    Uri uri = Uri.fromFile(picFile);
+                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }catch (NullPointerException ne){
+                        ne.printStackTrace();
+                    }
+                }
             }
-        }
+        }).start();
     }
 
     public Activity getActivity(){

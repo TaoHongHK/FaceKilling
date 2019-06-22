@@ -12,14 +12,20 @@
         <attr name="leftText" format="string"/>
         <attr name="leftTextColor" format="color"/>
         <attr name="leftTextVisible" format="boolean"/>
+        <attr name="leftTextBackground" format="reference|color"/>
         //左边按钮 左边按钮图片 是否可见
+        <attr name="leftButtWidth" format="dimension"/>
+        <attr name="leftButtHeight" format="dimension"/>
         <attr name="leftButtIcon" format="reference|color"/>
         <attr name="leftButtVisible" format="boolean"/>
         //右边文本 右边文本颜色 是否可见
         <attr name="rightText" format="string"/>
         <attr name="rightTextColor" format="color"/>
         <attr name="rightTextVisible" format="boolean" />
+        <attr name="rightTextBackground" format="reference|color"/>
         //右边按钮 右边按钮图片 是否可见
+        <attr name="rightButtWidth" format="dimension"/>
+        <attr name="rightButtHeight" format="dimension"/>
         <attr name="rightButtIcon" format="reference|color"/>
         <attr name="rightButtVisible" format="boolean"/>
     </declare-styleable>

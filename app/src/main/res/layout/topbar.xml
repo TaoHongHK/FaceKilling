@@ -13,8 +13,8 @@
 
         <Button
             android:id="@+id/toolbar_left_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/topbar_butt_width"
+            android:layout_height="@dimen/topbar_butt_height"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
@@ -30,7 +30,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:gravity="center"
-            android:textColor="#fff"
+            android:textColor="#000"
             android:textSize="16sp"
             android:visibility="gone" />
 
@@ -41,14 +41,14 @@
             android:layout_centerInParent="true"
             android:maxEms="10"
             android:singleLine="true"
-            android:textColor="#fff"
+            android:textColor="#000"
             android:textSize="18sp"
             android:visibility="invisible" />
 
         <Button
             android:id="@+id/toolbar_right_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/topbar_butt_width"
+            android:layout_height="@dimen/topbar_butt_height"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -64,7 +64,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:gravity="center"
-            android:textColor="#fff"
+            android:textColor="#000"
             android:textSize="16sp"
             android:visibility="gone" />
 

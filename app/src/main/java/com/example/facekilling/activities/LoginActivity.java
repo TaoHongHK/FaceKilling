@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
+import com.example.facekilling.javabean.MainUser;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
@@ -68,6 +69,9 @@ public class LoginActivity extends AppCompatActivity {
 
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
+        //创建登录用户类
+//        MainUser mainUser = MainUser.getInstance(email,password);
+        MainUser mainUser = MainUser.getInstance("12345678@163.com","帅锅",R.drawable.picture_13);
 
         // TODO: authentication logic here.
 

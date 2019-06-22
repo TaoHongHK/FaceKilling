@@ -25,7 +25,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:fillViewport="true">
             <TextView
                 android:id="@+id/cof_item_layout_head"
                 android:layout_width="match_parent"
@@ -38,13 +39,32 @@
                 android:id="@+id/cof_item_layout_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-            <ImageView
-                android:id="@+id/cof_item_layout_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:layout_marginBottom="5dp">
+                <LinearLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/cof_item_layout_picture"
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:fillViewport="true">
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/cof_item_layout_image"
+                        android:layout_width="300dp"
+                        android:layout_height="300dp"
+                        android:fillViewport="true"
+                        android:visibility="visible">
+                    </android.support.v7.widget.RecyclerView>
+                </LinearLayout>
+            </RelativeLayout>
+
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp">
                 <TextView
                     android:id="@+id/cof_item_layout_like_num"
                     android:layout_width="wrap_content"
@@ -56,6 +76,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:background="@drawable/like"
+                    android:layout_marginRight="10dp"
                     android:layout_gravity="right"
                     />
                 <Button
@@ -63,7 +84,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:background="@drawable/chat"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="20dp"
                     android:layout_gravity="right"/>
             </LinearLayout>
             <LinearLayout

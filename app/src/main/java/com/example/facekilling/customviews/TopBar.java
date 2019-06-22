@@ -2,6 +2,8 @@ package com.example.facekilling.customviews;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.Dimension;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.facekilling.R;
+import com.example.facekilling.util.DensityUtil;
 
 public class TopBar extends LinearLayout {
 
@@ -22,16 +25,22 @@ public class TopBar extends LinearLayout {
 
     private int leftTextColor;
     private int leftButtIcon;
+    private int leftTextBackground;
     private String leftText;
     private boolean leftTextVisible;
     private boolean leftButtVisible;
+    private float leftButtWidth;
+    private float leftButtHeight;
 
 
     private int rightTextColor;
     private int rightButtIcon;
     private String rightText;
     private boolean rightTextVisible;
+    private int rightTextBackground;
     private boolean rightButtVisible;
+    private float rightButtWidth;
+    private float rightButtHeight;
 
     private float titleTextSize;
     private int titleTextColor;
@@ -66,10 +75,13 @@ public class TopBar extends LinearLayout {
         }
         leftTextColor = typedArray.getColor(R.styleable.TopBar_leftTextColor,0);
         leftTextVisible = typedArray.getBoolean(R.styleable.TopBar_leftTextVisible,false);
+        leftTextBackground = typedArray.getResourceId(R.styleable.TopBar_leftTextBackground,-1);
 
         //左边按钮
         leftButtIcon = typedArray.getResourceId(R.styleable.TopBar_leftButtIcon,-1);
         leftButtVisible = typedArray.getBoolean(R.styleable.TopBar_leftButtVisible,true);
+        leftButtWidth = typedArray.getDimension(R.styleable.TopBar_leftButtWidth,R.dimen.topbar_butt_width);
+        leftButtHeight = typedArray.getDimension(R.styleable.TopBar_leftButtHeight,R.dimen.topbar_butt_height);
 
         //右边文本
         if (typedArray.hasValue(R.styleable.TopBar_rightText)){
@@ -77,10 +89,13 @@ public class TopBar extends LinearLayout {
         }
         rightTextColor = typedArray.getColor(R.styleable.TopBar_rightTextColor,0);
         rightTextVisible = typedArray.getBoolean(R.styleable.TopBar_rightTextVisible,false);
+        rightTextBackground = typedArray.getResourceId(R.styleable.TopBar_rightTextBackground,-1);
 
         //右边按钮
         rightButtIcon = typedArray.getResourceId(R.styleable.TopBar_rightButtIcon,-1);
         rightButtVisible = typedArray.getBoolean(R.styleable.TopBar_rightButtVisible,false);
+        rightButtWidth = typedArray.getDimension(R.styleable.TopBar_rightButtWidth,R.dimen.topbar_butt_width);
+        rightButtHeight = typedArray.getDimension(R.styleable.TopBar_rightButtHeight,R.dimen.topbar_butt_height);
 
         //中间标题
         titleTextSize = typedArray.getDimension(R.styleable.TopBar_titleTextSize,0);
@@ -105,10 +120,14 @@ public class TopBar extends LinearLayout {
         }
         else{
             leftTv.setVisibility(VISIBLE);
+            if(leftTextBackground!=-1)
+                leftTv.setBackground(getResources().getDrawable(leftTextBackground));
         }
         if(leftButtIcon != -1){
             leftButt.setBackgroundResource(leftButtIcon);
         }
+        leftButt.setWidth(DensityUtil.dp2dx(getContext(),leftButtWidth));
+        leftButt.setHeight(DensityUtil.dp2dx(getContext(),leftButtHeight));
         setButtVisible(leftButt,leftButtVisible);
         leftButt.setOnClickListener(new OnClickListener() {
             @Override
@@ -124,10 +143,14 @@ public class TopBar extends LinearLayout {
         }
         else {
             rightTv.setVisibility(VISIBLE);
+            if(rightTextBackground!=-1)
+                rightTv.setBackground(getResources().getDrawable(rightTextBackground));
         }
         if(rightButtIcon != -1){
             rightButt.setBackgroundResource(rightButtIcon);
         }
+        rightButt.setWidth(DensityUtil.dp2dx(getContext(),rightButtWidth));
+        rightButt.setHeight(DensityUtil.dp2dx(getContext(),rightButtHeight));
         setButtVisible(rightButt,rightButtVisible);
         rightButt.setOnClickListener(new OnClickListener() {
             @Override

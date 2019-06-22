@@ -22,6 +22,8 @@ import com.example.facekilling.R;
 import com.example.facekilling.fragments.Index_OneFragment;
 import com.example.facekilling.fragments.Index_ThreeFragment;
 import com.example.facekilling.fragments.Index_TwoFragment;
+import com.example.facekilling.javabean.MainUser;
+
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -38,6 +40,7 @@ public class IndexActivity extends AppCompatActivity {
     private int[] selectedTabIcon = {R.drawable.pkcolor,R.drawable.haoyoucolor,R.drawable.fricolor};
 
     private static Context context;
+
     public static Context getContext() {
         return context;
     }
@@ -122,6 +125,12 @@ public class IndexActivity extends AppCompatActivity {
         //监控侧边栏头像
         View navHeaderView = navigationView.getHeaderView(0);
         CircleImageView cirIViewHead = (CircleImageView) navHeaderView.findViewById(R.id.avatar_img);
+        cirIViewHead.setImageResource(MainUser.getInstance().getImageId());
+        TextView mail = (TextView) navHeaderView.findViewById(R.id.mail);
+        mail.setText(MainUser.getInstance().getEmail());
+        TextView user_name = (TextView) navHeaderView.findViewById(R.id.username);
+        user_name.setText(MainUser.getInstance().getUser_name());
+
         cirIViewHead.setOnClickListener(new View.OnClickListener() {
             @Override
 

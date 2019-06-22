@@ -1,4 +1,4 @@
-package com.example.facekilling.util;
+package com.example.facekilling.javabean;
 
 
 import com.example.facekilling.R;
@@ -13,30 +13,34 @@ public class Cof {
     private String user_name;     //用户名称
     private String content;      //发表的内容
     private Date date;           //发表的时间
-    List<Integer> images;        //发表的所有图片
+    List<Picture> imagesList;        //发表的所有图片
     private int praise_num;      //点赞数
     private List<Review> reviewList;
 
 
     //用于创建一个朋友圈消息
-    public Cof(int user_image,String user_name,String content,List<Integer> images){
+    public Cof(int user_image,String user_name,String content,List<Picture> imagesList){
         this.user_image = user_image;
         this.user_name = user_name;
         this.content = content;
         this.date = new Date();;
-        this.images = images;
+        this.imagesList = new ArrayList<>();
+        imagesList.addAll(imagesList);
+        initPictures();
         this.praise_num=0;
         this.reviewList = new ArrayList<>();
         initReview();
     }
     //用于从数据库中加载朋友圈
-    public Cof(int user_image, String user_name, String content, Date date, List<Integer> images,int praise_num,
+    public Cof(int user_image, String user_name, String content, Date date, List<Picture> imagesList,int praise_num,
                List<Review> reviewList){
         this.user_image = user_image;
         this.user_name = user_name;
         this.content = content;
         this.date = date;
-        this.images = images;
+        this.imagesList = new ArrayList<>();
+        imagesList.addAll(imagesList);
+        initPictures();
         this.praise_num=praise_num;
         this.reviewList = new ArrayList<>();
         reviewList.addAll(reviewList);
@@ -59,14 +63,15 @@ public class Cof {
         return date;
     }
 
-    public List<Integer> getImages() {
-        return images;
+    public List<Picture> getImagesList() {
+        return imagesList;
     }
-    public Integer getImage(){
-        int max = images.size();
+
+    public Picture getImage(){
+        int max = imagesList.size();
         Random random = new Random();
         int index = random.nextInt(max);
-        return images.get(index);
+        return imagesList.get(index);
     }
 
     public int getPraise_num() {
@@ -86,6 +91,31 @@ public class Cof {
         this.reviewList.add(new Review(user,"这是测试1这是测试2这是测试3"));
         this.reviewList.add(new Review(user,"这是测试1这是测试2这是测试3这是测试4"));
         this.reviewList.add(new Review(user,"asdfasdfasdf"));
+    }
+    //用于测试显示图片
+    private Picture[] pictures = {
+            new Picture(R.drawable.picture_01),
+            new Picture(R.drawable.picture_02),
+            new Picture(R.drawable.picture_03),
+            new Picture(R.drawable.picture_04),
+            new Picture(R.drawable.picture_05),
+            new Picture(R.drawable.picture_06),
+            new Picture(R.drawable.picture_07),
+            new Picture(R.drawable.picture_08),
+            new Picture(R.drawable.picture_09),
+            new Picture(R.drawable.picture_10),
+            new Picture(R.drawable.picture_11),
+            new Picture(R.drawable.picture_12),
+            new Picture(R.drawable.picture_13),
+            new Picture(R.drawable.picture_14),
+    };
+    private void initPictures(){
+        imagesList.clear();
+        for(int i=0;i<4;i++){
+            Random random = new Random();
+            int index = random.nextInt(pictures.length);
+            imagesList.add(pictures[index]);
+        }
     }
 
 

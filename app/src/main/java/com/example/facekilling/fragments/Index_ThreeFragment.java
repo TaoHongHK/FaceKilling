@@ -1,5 +1,6 @@
 package com.example.facekilling.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,10 +17,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
+import com.example.facekilling.activities.CofActivity;
 import com.example.facekilling.customviews.TopBar;
-import com.example.facekilling.util.Cof;
+import com.example.facekilling.javabean.Cof;
+import com.example.facekilling.javabean.Picture;
 import com.example.facekilling.util.CofAdapter;
-import com.example.facekilling.util.PictureAdapater;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +33,10 @@ public class Index_ThreeFragment extends Fragment {
     private TopBar topBar;
     private DrawerLayout drawerLayout;
 
+    //测试
     //显示信息
-    private List<Integer> images= new ArrayList<>();
+    private List<Picture> images= new ArrayList<>();
+
     private Cof[] cofs = {new Cof(R.drawable.picture_01,"测试1","这是一个测试1",images),
             new Cof(R.drawable.picture_02,"测试2","这是一个测试2",images),
             new Cof(R.drawable.picture_03,"测试3","这是一个测试3",images),
@@ -65,16 +69,7 @@ public class Index_ThreeFragment extends Fragment {
     public void initView(){
         topBar = (TopBar) mView.findViewById(R.id.cofTopBar);
         drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawerlayout);
-        topBar.setClickListener(new TopBar.TopbarClickListener() {
-            @Override
-            public void leftClicked() {
-                drawerLayout.openDrawer(Gravity.START);
-            }
 
-            @Override
-            public void rightClicked() {
-            }
-        });
 
         ImageView imageview = mView.findViewById(R.id.cof_background);
         imageview.setImageResource(R.drawable.picture_01);
@@ -96,13 +91,35 @@ public class Index_ThreeFragment extends Fragment {
             }
         });
 
+        //各种监控事件
+        monitor();
+
+
+    }
+    private void monitor(){
+        topBar = (TopBar) mView.findViewById(R.id.cofTopBar);
+        topBar.setClickListener(new TopBar.TopbarClickListener() {
+            @Override
+            //侧边栏
+            public void leftClicked() {
+                drawerLayout.openDrawer(Gravity.START);
+            }
+
+            @Override
+            //发表朋友圈
+            public void rightClicked() {
+                Intent intent = new Intent(getActivity(), CofActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
     }
     private void initCofs(){
-        images.add(R.drawable.picture_01);
-        images.add(R.drawable.picture_02);
-        images.add(R.drawable.picture_03);
-        images.add(R.drawable.picture_04);
+        images.add(new Picture(R.drawable.picture_01));
+        images.add(new Picture(R.drawable.picture_02));
+        images.add(new Picture(R.drawable.picture_03));
+        images.add(new Picture(R.drawable.picture_04));
         cofList.clear();
         for(int i=0;i<10;i++){
             Random random = new Random();

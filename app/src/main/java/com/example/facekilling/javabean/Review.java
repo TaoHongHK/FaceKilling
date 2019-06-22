@@ -1,5 +1,4 @@
-package com.example.facekilling.util;
-
+package com.example.facekilling.javabean;
 
 
 public class Review {

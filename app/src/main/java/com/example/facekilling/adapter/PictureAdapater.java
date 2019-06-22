@@ -1,4 +1,4 @@
-package com.example.facekilling.util;
+package com.example.facekilling.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.facekilling.R;
+import com.example.facekilling.javabean.Picture;
 
 import java.util.List;
 

@@ -1,10 +1,6 @@
-package com.example.facekilling.util;
+package com.example.facekilling.adapter;
 
 import android.content.Context;
-import android.media.Image;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.facekilling.R;
+import com.example.facekilling.javabean.Review;
 
 import java.util.List;
 

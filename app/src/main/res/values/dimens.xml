@@ -7,4 +7,6 @@
     <dimen name="camera_butt_size">70dp</dimen>
     <dimen name="half_camera_butt_size">35dp</dimen>
     <dimen name="cof_head_review_size">25dp</dimen>
+    <dimen name="topbar_butt_width">30dp</dimen>
+    <dimen name="topbar_butt_height">30dp</dimen>
 </resources>
