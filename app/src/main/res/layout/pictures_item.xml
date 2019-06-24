@@ -8,7 +8,8 @@
     android:layout_margin="5dp"
     app:cardCornerRadius="4dp">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/picture_item_layout"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -18,5 +19,12 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:scaleType="centerCrop"/>
-    </LinearLayout>
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|right"
+            android:focusable="false"
+            />
+    </FrameLayout>
 </android.support.v7.widget.CardView>

@@ -9,4 +9,5 @@
     <dimen name="cof_head_review_size">25dp</dimen>
     <dimen name="topbar_butt_width">30dp</dimen>
     <dimen name="topbar_butt_height">30dp</dimen>
+    <dimen name="friend_item_height">80dp</dimen>
 </resources>

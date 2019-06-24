@@ -73,7 +73,7 @@ public class Index_TwoFragment extends Fragment {
                         fragment = new Fri_ViewPagerFragment();
                         break;
                     case 1:
-                        fragment = new Chat_ViewPagerFragment();
+                        fragment = new Chat_DefaultFragment();
                         break;
                 }
                 return fragment;

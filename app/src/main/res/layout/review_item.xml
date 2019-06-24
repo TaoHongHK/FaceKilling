@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:layout_marginTop="13dp"
-        android:layout_marginLeft="9dp"
+        android:layout_marginStart="9dp"
         android:textSize="15sp" />
 
 </LinearLayout>

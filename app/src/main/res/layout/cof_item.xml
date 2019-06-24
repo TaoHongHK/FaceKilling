@@ -75,7 +75,7 @@
                     android:id="@+id/cof_item_layout_like"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:background="@drawable/like"
+                    android:background="@drawable/selector_like"
                     android:layout_marginRight="10dp"
                     android:layout_gravity="right"
                     />

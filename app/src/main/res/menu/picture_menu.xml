@@ -3,22 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.facekilling.activities.PicturesActivity">
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/picture_profile"
-            android:icon="@drawable/personal_menu"
-            android:title="profile" />
-        <item
-            android:id="@+id/picture_mail"
-            android:icon="@drawable/mail_menu"
-            android:title="mail" />
-        <item
-            android:id="@+id/picture_settings"
-            android:icon="@drawable/settings_menu"
-            android:title="settings" />
-        <item
-            android:id="@+id/picture_pictures"
-            android:icon="@drawable/pictures_menu"
-            android:title="pictures" />
-    </group>
+    <item
+        android:id="@+id/picture_choose"
+        android:icon="@drawable/multichoose"
+        android:title="多选/取消多选"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/picture_delete"
+        android:icon="@drawable/delete"
+        android:title="删除"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/picture_export"
+        android:icon="@drawable/share"
+        android:title="分享"
+        app:showAsAction="ifRoom"/>
 </menu>

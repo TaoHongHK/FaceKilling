@@ -3,56 +3,55 @@ package com.example.facekilling.javabean;
 
 import com.example.facekilling.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public class Cof {
-    private int user_image;       //用户头像
-    private String user_name;     //用户名称
+public class Cof implements Serializable {
+    private User user;
     private String content;      //发表的内容
     private Date date;           //发表的时间
     List<Picture> imagesList;        //发表的所有图片
     private int praise_num;      //点赞数
     private List<Review> reviewList;
 
-
-    //用于创建一个朋友圈消息
-    public Cof(int user_image,String user_name,String content,List<Picture> imagesList){
-        this.user_image = user_image;
-        this.user_name = user_name;
+    public Cof(User user,String content){
+        this.user = user;
         this.content = content;
         this.date = new Date();;
         this.imagesList = new ArrayList<>();
-        imagesList.addAll(imagesList);
         initPictures();
         this.praise_num=0;
         this.reviewList = new ArrayList<>();
         initReview();
     }
+    //用于创建一个朋友圈消息
+    public Cof(User user,String content,List<Picture> imagesList){
+        this.user = user;
+        this.content = content;
+        this.date = new Date();;
+        this.imagesList = new ArrayList<>();
+        this.imagesList.addAll(imagesList);
+        this.praise_num=0;
+        this.reviewList = new ArrayList<>();
+    }
     //用于从数据库中加载朋友圈
-    public Cof(int user_image, String user_name, String content, Date date, List<Picture> imagesList,int praise_num,
+    public Cof(User user, String content, Date date, List<Picture> imagesList,int praise_num,
                List<Review> reviewList){
-        this.user_image = user_image;
-        this.user_name = user_name;
+        this.user = user;
         this.content = content;
         this.date = date;
         this.imagesList = new ArrayList<>();
-        imagesList.addAll(imagesList);
-        initPictures();
+        this.imagesList.addAll(imagesList);
         this.praise_num=praise_num;
         this.reviewList = new ArrayList<>();
         reviewList.addAll(reviewList);
     }
 
-
-    public int getUser_image() {
-        return user_image;
-    }
-
-    public String getUser_name() {
-        return user_name;
+    public User getUser() {
+        return user;
     }
 
     public String getContent() {
@@ -67,12 +66,7 @@ public class Cof {
         return imagesList;
     }
 
-    public Picture getImage(){
-        int max = imagesList.size();
-        Random random = new Random();
-        int index = random.nextInt(max);
-        return imagesList.get(index);
-    }
+
 
     public int getPraise_num() {
         return praise_num;
@@ -92,6 +86,7 @@ public class Cof {
         this.reviewList.add(new Review(user,"这是测试1这是测试2这是测试3这是测试4"));
         this.reviewList.add(new Review(user,"asdfasdfasdf"));
     }
+
     //用于测试显示图片
     private Picture[] pictures = {
             new Picture(R.drawable.picture_01),

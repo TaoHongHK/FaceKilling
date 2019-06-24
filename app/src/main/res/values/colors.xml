@@ -6,4 +6,5 @@
     <color name="colorTheme">#e6e8e2</color>
     <color name="postButtColor">#70B9FC</color>
     <color name="colorUser">#28C4D0</color>
+    <color name="systemColor">#FAFAFA</color>
 </resources>

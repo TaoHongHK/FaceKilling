@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:app = "http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cof_my_layout"
+    android:orientation="vertical"
+    android:layout_width = "match_parent"
+    android:layout_height="match_parent">
+
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.example.facekilling.customviews.TopBar
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/FaceKillingTopBarHeight"
+                android:id="@+id/myCofTopBar"
+                app:topBarBackgroundColor="@color/colorTheme"
+                app:leftButtIcon="@drawable/back"
+                app:rightButtIcon="@drawable/edit"
+                app:rightButtVisible="true"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:title="我的社区"
+                app:titleTextColor="#000"
+                app:layout_scrollFlags="scroll">
+            </com.example.facekilling.customviews.TopBar>
+
+            <ImageView
+                android:id="@+id/myCof_background"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:minHeight="0dp"
+                app:layout_scrollFlags="scroll"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+
+
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:layout_marginTop="20dp"
+            android:id="@+id/myCof_swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:descendantFocusability="blocksDescendants">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/myCof_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="20dp"
+                android:fillViewport="true"
+                android:descendantFocusability="blocksDescendants"/>
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+
+    </android.support.design.widget.CoordinatorLayout>
+</LinearLayout>
+

@@ -49,12 +49,6 @@ public class BiaoQingBaoCameraActivity extends Activity {
     private boolean isCameraing;
 
 
-    public BiaoQingBaoCameraActivity() {
-        // Required empty public constructor
-    }
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

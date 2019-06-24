@@ -36,7 +36,9 @@
                 android:scaleType="fitXY"
                 android:minHeight="0dp"
                 app:layout_scrollFlags="scroll"/>
+
         </android.support.design.widget.AppBarLayout>
+
 
 
 
@@ -45,14 +47,31 @@
             android:id="@+id/cof_swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:descendantFocusability="blocksDescendants">
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/cof_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="20dp"
-                android:fillViewport="true"/>
+                android:fillViewport="true"
+                android:descendantFocusability="blocksDescendants"/>
         </android.support.v4.widget.SwipeRefreshLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/cof_head_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="16dp"
+            android:scaleType="center"
+            android:backgroundTint="@color/colorUser"
+            android:src="@drawable/my"
+            />
+
 
     </android.support.design.widget.CoordinatorLayout>
 </LinearLayout>
+
+
+

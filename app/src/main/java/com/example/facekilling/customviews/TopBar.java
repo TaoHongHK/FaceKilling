@@ -126,6 +126,13 @@ public class TopBar extends LinearLayout {
         if(leftButtIcon != -1){
             leftButt.setBackgroundResource(leftButtIcon);
         }
+        leftTv.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickListener.leftClicked();
+            }
+        });
+
         leftButt.setWidth(DensityUtil.dp2dx(getContext(),leftButtWidth));
         leftButt.setHeight(DensityUtil.dp2dx(getContext(),leftButtHeight));
         setButtVisible(leftButt,leftButtVisible);
@@ -149,6 +156,14 @@ public class TopBar extends LinearLayout {
         if(rightButtIcon != -1){
             rightButt.setBackgroundResource(rightButtIcon);
         }
+        rightTv.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickListener.rightClicked();
+            }
+        });
+
+
         rightButt.setWidth(DensityUtil.dp2dx(getContext(),rightButtWidth));
         rightButt.setHeight(DensityUtil.dp2dx(getContext(),rightButtHeight));
         setButtVisible(rightButt,rightButtVisible);

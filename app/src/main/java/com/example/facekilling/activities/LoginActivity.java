@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordText.getText().toString();
         //创建登录用户类
 //        MainUser mainUser = MainUser.getInstance(email,password);
-        MainUser mainUser = MainUser.getInstance("12345678@163.com","帅锅",R.drawable.picture_13);
+        MainUser mainUser = MainUser.getInstance("帅锅",R.drawable.picture_13,"12345678@163.com");
 
         // TODO: authentication logic here.
 

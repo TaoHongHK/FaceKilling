@@ -19,7 +19,7 @@
             android:textColorHint="#a2a2a2"
             android:textSize="13sp"
             android:background="@drawable/comment"
-            android:layout_marginRight="7dp"
+            android:layout_marginRight="10dp"
             android:layout_marginLeft="15dp"
             android:layout_marginBottom="6dp"
             android:layout_marginTop="6dp"

@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+
 public class FaceKCamera {
 
     private SurfaceView mSurfaceView;
@@ -42,6 +43,7 @@ public class FaceKCamera {
     private int numberOfCameras;
     private int usingCamera;
     private Bitmap mBitmap;
+    private ImageView imageView;
 
 
     public FaceKCamera(@NonNull SurfaceView surfaceView, @NonNull Activity activity){
@@ -52,6 +54,7 @@ public class FaceKCamera {
     }
 
 
+    //初始化相机信息
     private void initCameraInfo(){
         numberOfCameras = Camera.getNumberOfCameras();
         for (int i = 0; i < numberOfCameras; ++i) {
@@ -66,9 +69,11 @@ public class FaceKCamera {
                 frontCameraId = i;
             }
         }
-
+        viewHeight = mSurfaceView.getHeight();
+        viewWidth = mSurfaceView.getWidth();
     }
 
+    //初始化前置相机
     private void initFrontCamera() {
         mCamera = Camera.open(frontCameraId);//默认开启后置
         mCamera.setDisplayOrientation(90);//摄像头进行旋转90°
@@ -96,6 +101,7 @@ public class FaceKCamera {
         usingCamera = frontCameraId;
     }
 
+    //初始化后置相机
     private void initBackCamera() {
         mCamera = Camera.open(backCameraId);//默认开启后置
         mCamera.setDisplayOrientation(270);//摄像头进行旋转90°
@@ -123,6 +129,7 @@ public class FaceKCamera {
         usingCamera = backCameraId;
     }
 
+    //关闭相机
     public void stopCamera(){
         if(mCamera!=null){
             mCamera.stopPreview();
@@ -131,6 +138,7 @@ public class FaceKCamera {
         }
     }
 
+    //初始化相机视图
     private void initView() {
         initCameraInfo();
         askForPermission();
@@ -148,10 +156,7 @@ public class FaceKCamera {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) { //SurfaceView销毁
-                // 释放Camera资源
-                if (mCamera != null) {
-                    stopCamera();
-                }
+
             }
         });
         //设置点击监听
@@ -159,8 +164,6 @@ public class FaceKCamera {
             @Override
             public void onClick(View v) {
                 if (mCamera == null) return;
-                //自动对焦后拍照
-                //mCamera.autoFocus(autoFocusCallback);
                 mCamera.autoFocus(new Camera.AutoFocusCallback() {
                     @Override
                     public void onAutoFocus(boolean success, Camera camera) {
@@ -171,6 +174,7 @@ public class FaceKCamera {
         });
     }
 
+    //切换前后置相机
     public void changeCamera(){
         if (usingCamera==frontCameraId){
             stopCamera();
@@ -181,6 +185,8 @@ public class FaceKCamera {
         }
     }
 
+
+    //拍照
     public void takePicture(){
         if (mCamera==null){
             return;
@@ -191,16 +197,28 @@ public class FaceKCamera {
                 public void onShutter() {
                     //按下快门瞬间的操作
                 }
-            }, new Camera.PictureCallback() {
-                @Override
-                public void onPictureTaken(byte[] data, Camera camera) {//是否保存原始图片的信息
-
-                }
-            }, pictureCallback);
+            },null ,takePictureCallback);
         }
     }
 
-    Camera.PictureCallback pictureCallback = new Camera.PictureCallback() {
+    //拍照并显示照片
+    public void takeAndShowPicture(ImageView imageView){
+        if (mCamera==null){
+            return;
+        }
+        else {
+            this.imageView = imageView;
+            mCamera.takePicture(new Camera.ShutterCallback() {//按下快门
+                @Override
+                public void onShutter() {
+                    //按下快门瞬间的操作
+                }
+            },null ,takeAndShowPictureCallBack);
+        }
+    }
+
+    //拍照回调
+    private Camera.PictureCallback takePictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
             final Bitmap resource = BitmapFactory.decodeByteArray(data, 0, data.length);
@@ -210,48 +228,74 @@ public class FaceKCamera {
             final Matrix matrix = new Matrix();
             matrix.setRotate(-90);
             mBitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
-            mCamera.stopPreview();
             savePic(mBitmap);
         }
     };
 
+    //拍照并显示照片回调
+    private Camera.PictureCallback takeAndShowPictureCallBack = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            final Bitmap resource = BitmapFactory.decodeByteArray(data, 0, data.length);
+            if (resource == null) {
+                Toast.makeText(context, "拍照失败", Toast.LENGTH_SHORT).show();
+            }
+            final Matrix matrix = new Matrix();
+            matrix.setRotate(-90);
+            mBitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
+            stopProView();
+            if (imageView!=null){
+                imageView.setImageBitmap(mBitmap);
+            }
+            savePic(mBitmap);
+            stopCamera();
+        }
+    };
+
+
+
+    //保存图片功能
     private void savePic(final Bitmap bitmap){
-            String sdStatus = Environment.getExternalStorageState();
-            if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
-                return;
-            }
-            FileOutputStream fileOutputStream = null;
-            String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+"Camera";
-            File baseFile = new File(baseFilePath);
-            if (!baseFile.exists()) {
-                baseFile.mkdirs();
-                Log.d("cameraMMMMM","file created");
-            }
-            String pickName = GetSysTime.getCurrTime() +".jpg";
-            Log.d("cameraMMMMM",pickName);
-            try {
-                File picFile = new File(baseFile,pickName);
-                fileOutputStream = new FileOutputStream(picFile);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                MediaStore.Images.Media.insertImage(context.getContentResolver(), picFile.getPath(), pickName, "description");
-                Uri uri = Uri.fromFile(picFile);
-                context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String sdStatus = Environment.getExternalStorageState();
+                if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+                    return;
+                }
+                FileOutputStream fileOutputStream = null;
+                String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+"Camera";
+                File baseFile = new File(baseFilePath);
+                if (!baseFile.exists()) {
+                    baseFile.mkdirs();
+                    Log.d("cameraMMMMM","file created");
+                }
+                String pickName = GetSysTime.getCurrTime() +".jpg";
+                Log.d("cameraMMMMM",pickName);
                 try {
-                    fileOutputStream.flush();
-                    fileOutputStream.close();
-                } catch (IOException e) {
+                    File picFile = new File(baseFile,pickName);
+                    fileOutputStream = new FileOutputStream(picFile);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    MediaStore.Images.Media.insertImage(context.getContentResolver(), picFile.getPath(), pickName, "description");
+                    Uri uri = Uri.fromFile(picFile);
+                    context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+                } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                }catch (NullPointerException ne){
-                    ne.printStackTrace();
+                } finally {
+                    try {
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }catch (NullPointerException ne){
+                        ne.printStackTrace();
+                    }
                 }
             }
-
+        }).start();
     }
 
-
+    //获取相机权限
     private void askForPermission(){
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -268,16 +312,18 @@ public class FaceKCamera {
         }
     }
 
-    public void showImg(ImageView imageView){
-        if (mBitmap != null && imageView != null && imageView.getVisibility() == View.GONE) {
-            imageView.setImageBitmap(mBitmap);
-        }
-    }
 
+    //开始相机预览
     public void startProView(){
         mCamera.startPreview();
     }
 
+    //关闭相机预览
+    public void stopProView(){
+        mCamera.stopPreview();
+    }
+
+    //获取相机对象
     public Camera getmCamera() {
         return mCamera;
     }

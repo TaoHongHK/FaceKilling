@@ -1,7 +1,9 @@
 package com.example.facekilling.javabean;
 
 
-public class Review {
+import java.io.Serializable;
+
+public class Review implements Serializable {
     private User user;
     private String content;
 

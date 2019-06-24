@@ -1,4 +1,4 @@
-package com.example.facekilling.util;
+package com.example.facekilling.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -33,6 +33,7 @@ import com.example.facekilling.R;
 import com.example.facekilling.adapter.PictureAdapater;
 import com.example.facekilling.adapter.ReviewAdapter;
 import com.example.facekilling.javabean.Cof;
+import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.javabean.Picture;
 import com.example.facekilling.javabean.Review;
 
@@ -46,6 +47,18 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
     private Context mContext;
     private List<Cof> mCofList;
     private Context mcontext;
+
+    private PopupWindow popupWindow;
+    private View popupView = null;
+    private EditText inputComment;
+    private String nInputContentText;
+    private TextView btn_submit;
+    private RelativeLayout rl_input_container;
+    private InputMethodManager mInputManager;
+    private int commentIndex;
+    private String comment = "";
+
+    private boolean likeStatus = false;   //false表示没点赞，true表示点赞了
 
 
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -93,8 +106,8 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
 
     public void onBindViewHolder(@NonNull CofAdapter.ViewHolder holder, int position) {
         Cof cof = mCofList.get(position);
-        Glide.with(mContext).load(cof.getUser_image()).into(holder.headimage);
-        holder.head_name.setText(cof.getUser_name());
+        Glide.with(mContext).load(cof.getUser().getImageId()).into(holder.headimage);
+        holder.head_name.setText(cof.getUser().getUser_name());
         holder.content.setText(cof.getContent());
 
         LinearLayout linearLayout = holder.pictureLinearLayout;
@@ -147,26 +160,36 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
         listView.setLayoutParams(params);
         listView.setAdapter(reviewAdapter);
 
-        monitor(holder);
+        monitor(holder,position);
 
     }
 
-    private void monitor(CofAdapter.ViewHolder holder){
+    private void monitor(CofAdapter.ViewHolder holder,int position){
 
-        Button like_button = holder.like_button;
+        final Button like_button = holder.like_button;
         Button review_button = holder.review_button;
 
         //点赞事件
         like_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Toast.makeText(mContext,"点赞",Toast.LENGTH_SHORT).show();
+                if(likeStatus){
+                    like_button.setBackgroundResource(R.drawable.like);
+                    likeStatus = false;
+                }
+                else{
+                    like_button.setBackgroundResource(R.drawable.like_press);
+                    likeStatus = true;
+                }
+
             }
         });
         //评论事件
+        final int index = position;
         review_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Toast.makeText(mContext,"评论",Toast.LENGTH_SHORT).show();
+
                 showPopupcomment();
+                commentIndex = index;
             }
         });
     }
@@ -174,13 +197,7 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
         return mCofList.size();
     }
 
-    private PopupWindow popupWindow;
-    private View popupView = null;
-    private EditText inputComment;
-    private String nInputContentText;
-    private TextView btn_submit;
-    private RelativeLayout rl_input_container;
-    private InputMethodManager mInputManager;
+
     @SuppressLint("WrongConstant")
     private void showPopupcomment() {
         if (popupView == null){
@@ -188,6 +205,7 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
             popupView = LayoutInflater.from(mContext).inflate(R.layout.comment_popupwindow, null);
         }
         inputComment = (EditText) popupView.findViewById(R.id.et_discuss);
+        inputComment.setText("");
         btn_submit = (Button) popupView.findViewById(R.id.btn_confirm);
         rl_input_container = (RelativeLayout)popupView.findViewById(R.id.rl_input_container);
         //利用Timer这个Api设置延迟显示软键盘，这里时间为200毫秒
@@ -267,6 +285,12 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
                 }
                 mInputManager.hideSoftInputFromWindow(inputComment.getWindowToken(),0);
                 popupWindow.dismiss();
+                //
+                comment += nInputContentText;
+                Review review = new Review(MainUser.getInstance(),comment);
+                Cof cof = mCofList.get(commentIndex);
+                cof.getReviewList().add(review);
+                notifyDataSetChanged();
 
             }
         });

@@ -2,7 +2,9 @@ package com.example.facekilling.javabean;
 
 import android.graphics.Bitmap;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     protected String email;
     protected String user_name;
     protected int imageId;
@@ -12,13 +14,13 @@ public class User {
         this.imageId = imageId;
         this.user_name = user_name;
     }
-    public User(String email,String user_name,int imageId) {
+    public User(String user_name,int imageId,String email) {
         this.email = email;
         this.imageId = imageId;
         this.user_name = user_name;
     }
 
-    public User(String email,String user_name, int imageId, Bitmap bitmap) {
+    public User(String user_name, int imageId,String email, Bitmap bitmap) {
         this.email = email;
         this.user_name = user_name;
         this.imageId = imageId;
@@ -42,5 +44,14 @@ public class User {
 
     public Bitmap getBitmap() {
         return bitmap;
+    }
+
+    public boolean equals(User obj) {
+        if(this.email.equals(obj.getEmail()) ){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }

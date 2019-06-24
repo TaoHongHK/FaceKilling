@@ -22,6 +22,7 @@ import com.example.facekilling.R;
 import com.example.facekilling.fragments.Index_OneFragment;
 import com.example.facekilling.fragments.Index_ThreeFragment;
 import com.example.facekilling.fragments.Index_TwoFragment;
+import com.example.facekilling.javabean.Cof;
 import com.example.facekilling.javabean.MainUser;
 
 
@@ -40,6 +41,7 @@ public class IndexActivity extends AppCompatActivity {
     private int[] selectedTabIcon = {R.drawable.pkcolor,R.drawable.haoyoucolor,R.drawable.fricolor};
 
     private static Context context;
+    private Cof cof;
 
     public static Context getContext() {
         return context;
@@ -54,6 +56,8 @@ public class IndexActivity extends AppCompatActivity {
 
         //侧边栏监控
         monitorSidebar();
+
+
 
         mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
@@ -70,6 +74,14 @@ public class IndexActivity extends AppCompatActivity {
             }
         });
         initTab(mTabHost);
+
+        //        //从发表按钮回来
+        Intent intent = getIntent();
+        int id = getIntent().getIntExtra("id", 0);
+        cof = (Cof)intent.getSerializableExtra("cof");
+        if (id != 0) {
+            switchTab(id-1);
+        }
     }
 
     private TabHost.TabSpec getTabView(int textId, int imgId) {
@@ -94,6 +106,8 @@ public class IndexActivity extends AppCompatActivity {
         textView.setTextColor(getResources().getColor(R.color.colorTheme));
         lastChosenTab = 0;
     }
+
+
 
     private void updateTab(TabHost tabHost){
         if(lastChosenTab!=-1){
@@ -144,8 +158,8 @@ public class IndexActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch(menuItem.getItemId()){
                     case R.id.nav_profile:
-                        Toast.makeText(getContext(),"click the profile",Toast.LENGTH_SHORT).show();
                         drawerLayout.closeDrawers();
+                        enterProfile();
                         break;
                     case R.id.nav_mail:
                         Toast.makeText(getContext(),"click the mail",Toast.LENGTH_SHORT).show();
@@ -156,7 +170,6 @@ public class IndexActivity extends AppCompatActivity {
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.nav_pictures:
-                        Toast.makeText(getContext(),"click the pictures", Toast.LENGTH_SHORT).show();
                         drawerLayout.closeDrawers();
                         enterPictures();
                         break;
@@ -167,11 +180,25 @@ public class IndexActivity extends AppCompatActivity {
             }
         });
     }
+    //宿主activity中的getTitles()方法
+    public Cof getCof(){
+        return cof;
+    }
 
     //进入图库
     protected void enterPictures(){
         Intent intent = new Intent(getContext(), PicturesActivity.class);
         startActivity(intent);
+    }
+
+    public void enterProfile(){
+        Intent intent = new Intent(getContext(), ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    public void switchTab(int index){
+        mTabHost.setCurrentTab(index);
+        lastChosenTab = index;
     }
 
 }
