@@ -4,6 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +34,7 @@ import com.example.facekilling.fragments.Index_ThreeFragment;
 import com.example.facekilling.javabean.Cof;
 import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.javabean.Picture;
+import com.example.facekilling.util.GetBitmap;
 
 
 import java.io.Serializable;
@@ -48,6 +54,8 @@ public class CofActivity extends AppCompatActivity {
     private TextView head_name;
     private ImageView head_photo;
     private EditText editText;
+
+    private RecyclerView recyclerView;
 
 
     private List<Picture> picturesList = new ArrayList<>();
@@ -102,7 +110,7 @@ public class CofActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.cof_activity_head_content);
 
         initPictures();
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.cof_activity_imgs);
+        recyclerView = (RecyclerView) findViewById(R.id.cof_activity_imgs);
         StaggeredGridLayoutManager layoutManager = new
                 StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
 
@@ -175,11 +183,13 @@ public class CofActivity extends AppCompatActivity {
                         switch(which){
                             case 0:
                                 //拍摄照片
-                                Toast.makeText(getContent(),"拍摄照片",Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getApplicationContext(),PostCofCameraActivity.class);
+                                startActivityForResult(intent,0);
                                 break;
                             case 1:
                                 //从应用图库中寻找
-                                Toast.makeText(getContent(),"从应用图库中寻找",Toast.LENGTH_SHORT).show();
+                                Intent intent_1 = new Intent(CofActivity.this,LookForImages.class);
+                                startActivity(intent_1);
                                 break;
                             case 2:
                                 //从本地图库寻找
@@ -205,4 +215,21 @@ public class CofActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode){
+            case 0:
+                /*byte[] bitmapByteArray = data.getByteArrayExtra("imgBitmap");
+                if (bitmapByteArray!=null) {
+                    picturesList.add(new Picture(
+                            BitmapFactory.decodeByteArray(bitmapByteArray, 0, bitmapByteArray.length)));
+                    adapter.notifyDataSetChanged();
+                }*/
+                String bitmapPath = data.getStringExtra("BitmapPath");
+                if (bitmapPath!=null){
+                    adapter.addPicture(new Picture(GetBitmap.getBitmapFromSD(bitmapPath)));
+                }
+                break;
+        }
+    }
 }

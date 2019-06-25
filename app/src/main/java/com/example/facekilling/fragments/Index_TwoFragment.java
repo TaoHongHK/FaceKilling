@@ -76,15 +76,6 @@ public class Index_TwoFragment extends Fragment {
         friTv = (TextView) mView.findViewById(R.id.fri_page_nav_tv);
         chatTv = (TextView) mView.findViewById(R.id.chat_page_nav_tv);
         Fri_ViewPagerFragment fri_viewPagerFragment = new Fri_ViewPagerFragment();
-        fri_viewPagerFragment.setItemClickListener(new Fri_ViewPagerFragment.ItemClickListener() {
-            @Override
-            public void onItemClicked(String userName) {
-                fragments.remove(fragments.size()-1);
-                fragments.add(Chat_ViewPagerFragment.newInstance(userName));
-                myStatePageAdapter.notifyDataSetChanged();
-                swichViewPage(1);
-            }
-        });
         fragments.add(fri_viewPagerFragment);
         fragments.add(new Chat_DefaultFragment());
         mViewPager.setCurrentItem(0);
@@ -126,7 +117,22 @@ public class Index_TwoFragment extends Fragment {
 
             }
         });
+        fri_viewPagerFragment.setItemClickListener(new Fri_ViewPagerFragment.ItemClickListener() {
+            @Override
+            public void onItemClicked(String userName) {
+                fragments.remove(fragments.size()-1);
+                fragments.add(Chat_ViewPagerFragment.newInstance(userName));
+                myStatePageAdapter.notifyDataSetChanged();
+                swichViewPage(1);
+            }
+        });
         mViewPager.setAdapter(myStatePageAdapter);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        fragments.clear();
     }
 
     public void swichViewPage(int index){

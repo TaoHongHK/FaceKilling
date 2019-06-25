@@ -27,6 +27,9 @@
         <activity android:name=".activities.YanZhiCameraActivity" />
         <activity android:name=".activities.CofActivity" />
         <activity android:name=".activities.demoApi" />
+        <activity android:name=".activities.MyCofActivity"/>
+        <activity android:name=".activities.PostCofCameraActivity"/>
+        <activity android:name=".activities.LookForImages"/>
         <activity
             android:name=".activities.LoginActivity"
             android:screenOrientation="portrait">

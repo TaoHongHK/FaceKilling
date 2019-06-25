@@ -25,14 +25,15 @@
                 android:layout_height="30dp"
                 android:src="@drawable/back"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"/>
+                android:layout_marginStart="10dp"/>
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="77.5dp"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
                 android:src="@drawable/avatar_shape"
                 android:layout_gravity="bottom"
-                android:layout_marginBottom="-12dp"/>
+                android:layout_marginBottom="-1dp"/>
 
             <TextView
                 android:id="@+id/activity_profile_changeAvatar"

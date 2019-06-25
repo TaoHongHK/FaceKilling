@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -25,6 +26,7 @@ public class Index_OneFragment extends Fragment {
     private TopBar topBar;
     private DrawerLayout drawerLayout;
     private ImageView clickImg;
+
 
 
     @Override
@@ -64,6 +66,7 @@ public class Index_OneFragment extends Fragment {
         private int imageWidth;
         private int touchX;
         private int touchY;
+        private boolean isTouch = false;
 
 
 
@@ -76,17 +79,24 @@ public class Index_OneFragment extends Fragment {
                 public boolean onTouch(View v, MotionEvent event) {
                     touchX = (int)event.getX();
                     touchY = (int) event.getY();
+                    isTouch = true;
                     return false;
                 }
             });
-            if (touchY<imageHeight/2-30) {
-                Intent intent = new Intent(getContext(), YanZhiCameraActivity.class);
-                startActivity(intent);
+            if(isTouch){
+                double k = -(0.261447 * imageHeight)/imageWidth;
+                double b = 0.647623 * imageHeight;
+                if( (touchY < k * touchX + b)){
+                    Intent intent = new Intent(getContext(), YanZhiCameraActivity.class);
+                    startActivity(intent);
+                }
+                else if(touchY > k * touchX + b){
+                    Intent intent = new Intent(getContext(), BiaoQingBaoCameraActivity.class);
+                    startActivity(intent);
+                }
+                isTouch = false;
             }
-            else if (touchY>imageHeight/2+30){
-                Intent intent = new Intent(getContext(), BiaoQingBaoCameraActivity.class);
-                startActivity(intent);
-            }
+
         }
     }
 

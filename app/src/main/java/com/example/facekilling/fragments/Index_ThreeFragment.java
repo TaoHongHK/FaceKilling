@@ -175,7 +175,7 @@ public class Index_ThreeFragment extends Fragment {
                         myCofList.add(cof);
                     }
                 }
-                Intent intent = new Intent(getActivity(), MyCofActivity.class);
+                Intent intent = new Intent(getActivity(),MyCofActivity.class);
                 intent.putExtra("cofList",(Serializable)myCofList);
                 startActivity(intent);
             }

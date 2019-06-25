@@ -7,9 +7,11 @@
     <TextView
         android:id="@+id/fragment_chat_fri"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/FaceKillingTopBarHeight"
+        android:layout_height="40dp"
         android:textColor="#000"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:paddingTop="10dp"
+        android:textSize="15sp"/>
 
     <android.support.v7.widget.RecyclerView
         android:background="#eeeeee"

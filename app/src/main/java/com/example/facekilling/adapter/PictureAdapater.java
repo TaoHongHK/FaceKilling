@@ -58,6 +58,11 @@ public class PictureAdapater extends RecyclerView.Adapter<PictureAdapater.ViewHo
         mPictureList = pictureList;
     }
 
+    public void addPicture(Picture picture){
+        mPictureList.add(picture);
+        this.notifyItemInserted(mPictureList.size()-1);
+    }
+
 
     @NonNull
     @Override
@@ -131,6 +136,7 @@ public class PictureAdapater extends RecyclerView.Adapter<PictureAdapater.ViewHo
 
 
     }
+
 
     @Override
     public int getItemCount() {
