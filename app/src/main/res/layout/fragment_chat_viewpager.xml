@@ -9,12 +9,11 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/FaceKillingTopBarHeight"
         android:textColor="#000"
-        android:textAlignment="center"
-        android:layout_marginBottom="30dp"/>
+        android:textAlignment="center"/>
 
     <android.support.v7.widget.RecyclerView
         android:background="#eeeeee"
-        android:id="@+id/recy"
+        android:id="@+id/fragment_chat_recy"
         android:layout_width="match_parent"
         android:layout_weight="1"
         android:layout_height="0dp"/>
@@ -25,12 +24,12 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/text"
+            android:id="@+id/fragment_chat_text"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
         <Button
-            android:id="@+id/bt"
+            android:id="@+id/fragment_chat_bt"
             android:text="发送"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

@@ -1,10 +1,12 @@
 package com.example.facekilling.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,17 @@ import java.util.List;
 public class Fri_ViewPagerFragment extends Fragment {
 
     private View mView;
+    private Context context;
     private List<Friend> userList = new ArrayList<>();
+    private ItemClickListener itemClickListener;
 
+    public interface ItemClickListener{
+        void onItemClicked(String userName);
+    }
+
+    public void setItemClickListener(ItemClickListener itemClickListener){
+        this.itemClickListener = itemClickListener;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,8 +44,10 @@ public class Fri_ViewPagerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        context = getContext();
         mView = inflater.inflate(R.layout.fragment_fri_viewpager,container,false);
         initView();
+        Log.d("friviewpager", "onCreateView: ");
         return mView;
     }
 
@@ -46,8 +59,7 @@ public class Fri_ViewPagerFragment extends Fragment {
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-
+                itemClickListener.onItemClicked(userList.get(i).getUser_name());
             }
         });
     }
@@ -55,19 +67,19 @@ public class Fri_ViewPagerFragment extends Fragment {
     private void  initUsers() {
         Friend user_1 = new Friend("张三", R.drawable.touxiang_1,"上海北京");
         userList.add(user_1);
-        Friend user_2 = new Friend("张三", R.drawable.touxiang_2, "qinyuf");
+        Friend user_2 = new Friend("李四", R.drawable.touxiang_2, "qinyuf");
         userList.add(user_2);
-        Friend user_3 = new Friend("张三", R.drawable.touxiang_3, "qinyuf");
+        Friend user_3 = new Friend("王五", R.drawable.touxiang_3, "qinyuf");
         userList.add(user_3);
-        Friend user_4 = new Friend("张三", R.drawable.touxiang_1,"");
+        Friend user_4 = new Friend("王二麻子", R.drawable.touxiang_1,"");
         userList.add(user_4);
-        Friend user_5 = new Friend("张三", R.drawable.touxiang_2,"");
+        Friend user_5 = new Friend("狗蛋", R.drawable.touxiang_2,"");
         userList.add(user_5);
-        Friend user_6 = new Friend("张三", R.drawable.touxiang_3,"");
+        Friend user_6 = new Friend("小明", R.drawable.touxiang_3,"");
         userList.add(user_6);
-        Friend user_7 = new Friend("张三", R.drawable.touxiang_1,"");
+        Friend user_7 = new Friend("小玉", R.drawable.touxiang_1,"");
         userList.add(user_7);
-        Friend user_8 = new Friend("张三", R.drawable.touxiang_2,"");
+        Friend user_8 = new Friend("小微", R.drawable.touxiang_2,"");
         userList.add(user_8);
         Friend user_9 = new Friend("张三", R.drawable.touxiang_3,"");
         userList.add(user_9);

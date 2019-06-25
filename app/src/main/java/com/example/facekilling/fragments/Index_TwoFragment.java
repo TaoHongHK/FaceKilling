@@ -4,8 +4,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
@@ -15,12 +17,16 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
 import com.example.facekilling.customviews.TopBar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Index_TwoFragment extends Fragment {
 
@@ -31,10 +37,14 @@ public class Index_TwoFragment extends Fragment {
     private ViewPager mViewPager;
     private TextView friTv;
     private TextView chatTv;
+    private List<Fragment> fragments = new ArrayList<>();
+
+    private MyStatePageAdapter myStatePageAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("index2", "onCreate: ");
     }
 
     @Nullable
@@ -43,11 +53,12 @@ public class Index_TwoFragment extends Fragment {
         mContext = getActivity();
         mView = inflater.inflate(R.layout.fragment_index__two,container,false);
         initView();
-
+        Log.d("index2", "onCreateView: ");
         return mView;
     }
 
     public void initView(){
+        myStatePageAdapter = new MyStatePageAdapter(getChildFragmentManager());
         topBar = (TopBar) mView.findViewById(R.id.indexTwoTopBar);
         drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawerlayout);
         topBar.setClickListener(new TopBar.TopbarClickListener() {
@@ -64,42 +75,30 @@ public class Index_TwoFragment extends Fragment {
         mViewPager = (ViewPager) mView.findViewById(R.id.index_viewPager);
         friTv = (TextView) mView.findViewById(R.id.fri_page_nav_tv);
         chatTv = (TextView) mView.findViewById(R.id.chat_page_nav_tv);
-        mViewPager.setAdapter(new FragmentStatePagerAdapter(getChildFragmentManager()) {
+        Fri_ViewPagerFragment fri_viewPagerFragment = new Fri_ViewPagerFragment();
+        fri_viewPagerFragment.setItemClickListener(new Fri_ViewPagerFragment.ItemClickListener() {
             @Override
-            public Fragment getItem(int i) {
-                Fragment fragment = null;
-                switch (i){
-                    case 0:
-                        fragment = new Fri_ViewPagerFragment();
-                        break;
-                    case 1:
-                        fragment = new Chat_DefaultFragment();
-                        break;
-                }
-                return fragment;
-            }
-
-            @Override
-            public int getCount() {
-                return 2;
+            public void onItemClicked(String userName) {
+                fragments.remove(fragments.size()-1);
+                fragments.add(Chat_ViewPagerFragment.newInstance(userName));
+                myStatePageAdapter.notifyDataSetChanged();
+                swichViewPage(1);
             }
         });
+        fragments.add(fri_viewPagerFragment);
+        fragments.add(new Chat_DefaultFragment());
         mViewPager.setCurrentItem(0);
         friTv.setBackgroundResource(R.drawable.blank);
         friTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewPager.setCurrentItem(0);
-                friTv.setBackgroundResource(R.drawable.blank);
-                chatTv.setBackgroundResource(0);
+                swichViewPage(0);
             }
         });
         chatTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewPager.setCurrentItem(1);
-                chatTv.setBackgroundResource(R.drawable.blank);
-                friTv.setBackgroundResource(0);
+                swichViewPage(1);
             }
         });
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -127,5 +126,45 @@ public class Index_TwoFragment extends Fragment {
 
             }
         });
+        mViewPager.setAdapter(myStatePageAdapter);
+    }
+
+    public void swichViewPage(int index){
+        if(mViewPager!=null){
+            if (index==0){
+                mViewPager.setCurrentItem(index);
+                friTv.setBackgroundResource(R.drawable.blank);
+                chatTv.setBackgroundResource(0);
+            }else {
+                mViewPager.setCurrentItem(index);
+                chatTv.setBackgroundResource(R.drawable.blank);
+                friTv.setBackgroundResource(0);
+            }
+        }
+
+    }
+
+    class MyStatePageAdapter extends FragmentStatePagerAdapter{
+
+        public MyStatePageAdapter(FragmentManager fm) {
+            super(fm);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            return fragments.get(i);
+        }
+
+        @Override
+        public int getCount() {
+            return fragments.size();
+        }
+
+        @Override
+        public int getItemPosition(@NonNull Object object) {
+            return PagerAdapter.POSITION_NONE;
+        }
+
     }
 }
