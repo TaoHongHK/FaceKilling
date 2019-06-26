@@ -19,17 +19,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ProfileActivity"></activity>
-        <activity android:name=".activities.IndexActivity" />
+        <activity android:name=".activities.AddFriendsActivity"></activity>
+        <activity android:name=".activities.ProfileActivity" />
+        <activity
+            android:name=".activities.IndexActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".activities.SignupActivity" />
         <activity android:name=".activities.PicturesActivity" />
         <activity android:name=".activities.BiaoQingBaoCameraActivity" />
         <activity android:name=".activities.YanZhiCameraActivity" />
         <activity android:name=".activities.CofActivity" />
-        <activity android:name=".activities.demoApi" />
-        <activity android:name=".activities.MyCofActivity"/>
-        <activity android:name=".activities.PostCofCameraActivity"/>
-        <activity android:name=".activities.LookForImages"/>
+        <activity android:name=".activities.MyCofActivity" />
+        <activity android:name=".activities.PostCofCameraActivity" />
+        <activity android:name=".activities.LookForImages" />
         <activity
             android:name=".activities.LoginActivity"
             android:screenOrientation="portrait">

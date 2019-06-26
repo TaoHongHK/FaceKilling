@@ -13,6 +13,8 @@
         android:id="@+id/indexTwoTopBar"
         app:topBarBackgroundColor="@color/colorTheme"
         app:leftButtIcon="@drawable/menu"
+        app:rightButtVisible="true"
+        app:rightButtIcon="@drawable/scan_add"
         app:title="@string/tab_second"
         app:titleTextColor="#000">
     </com.example.facekilling.customviews.TopBar>

@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import com.example.facekilling.util.StaticConstant;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu.MenuStateChangeListener;
@@ -191,11 +192,13 @@ public class PicturesActivity extends AppCompatActivity  {
                 initView();
                 break;
             case R.id.item_export:
+                //之后发送到云端，cof从云端获取
                 List<Picture> mPictureList = new ArrayList<>();
                 mPictureList.add((Picture)picturesList.get(position).clone());
                 Intent intent = new Intent(PicturesActivity.this,CofActivity.class);
                 intent.putExtra("PictureList",(Serializable)mPictureList);
                 startActivity(intent);
+                finish();
                 break;
             default:
                 break;
@@ -333,6 +336,9 @@ public class PicturesActivity extends AppCompatActivity  {
                     Intent intent = new Intent(PicturesActivity.this,CofActivity.class);
                     intent.putExtra("PictureList",(Serializable)mPictureList);
                     startActivity(intent);
+                    Intent intent_1 = new Intent(IndexActivity.getContext(), CofActivity.class);
+                    startActivityForResult(intent, StaticConstant.GETCOF_FROM_NEW);
+                    finish();
                 }
                 else{
                     Toast.makeText(getContext(), "请选择图片进行分享", Toast.LENGTH_SHORT).show();

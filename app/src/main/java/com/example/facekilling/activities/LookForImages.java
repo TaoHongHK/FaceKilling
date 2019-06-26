@@ -18,6 +18,7 @@ import com.example.facekilling.R;
 import com.example.facekilling.adapter.PictureAdapater;
 import com.example.facekilling.customviews.TopBar;
 import com.example.facekilling.javabean.Picture;
+import com.example.facekilling.util.BitMap2Util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -55,9 +56,8 @@ public class LookForImages extends AppCompatActivity {
             new Picture(R.drawable.picture_13),
             new Picture(R.drawable.picture_14),
     };
+
     private List<Picture> picturesList = new ArrayList<>();
-
-
 
     public static Context getContext() {
         return context;
@@ -101,9 +101,10 @@ public class LookForImages extends AppCompatActivity {
                 }
                 //如果选择了图片
                 if(mPictureList.size() != 0){
-                    Intent intent = new Intent(LookForImages.this,CofActivity.class);
-                    intent.putExtra("PictureList",(Serializable)mPictureList);
-                    startActivity(intent);
+                    Intent intent = new Intent();
+                    intent.putExtra("LookForPictureList",(Serializable)mPictureList);
+                    setResult(1,intent);
+                    finish();
                 }
                 else{
                     Toast.makeText(getContext(), "请选择图片进行分享", Toast.LENGTH_SHORT).show();

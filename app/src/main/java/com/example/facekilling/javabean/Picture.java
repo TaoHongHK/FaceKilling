@@ -10,7 +10,7 @@ import java.util.Date;
 public class Picture implements Serializable ,Cloneable{
     private Date data;
     private Bitmap imageBitMap;
-    private int imageId;
+    private int imageId = -1;
 
     private boolean isChecked;
 
@@ -18,7 +18,6 @@ public class Picture implements Serializable ,Cloneable{
         this.imageId = imageId;
         this.isChecked = false;
     }
-
 
 
     public Picture(Bitmap imageId){

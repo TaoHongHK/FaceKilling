@@ -1,5 +1,8 @@
 package com.example.facekilling.util;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -17,11 +20,4 @@ public class GetBitmap {
         else return null;
     }
 
-    public static Bitmap getBitmapFromAlbum(){
-        return null;
-    }
-
-    public static List<Bitmap> getBitmapsFromAlbum(){
-        return null;
-    }
 }

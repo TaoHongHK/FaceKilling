@@ -1,12 +1,16 @@
 package com.example.facekilling.activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -19,8 +23,10 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,6 +41,7 @@ import com.example.facekilling.javabean.Cof;
 import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.javabean.Picture;
 import com.example.facekilling.util.GetBitmap;
+import com.example.facekilling.util.StaticConstant;
 
 
 import java.io.Serializable;
@@ -87,21 +94,31 @@ public class CofActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cof);
         mContext = getApplicationContext();
+
         picturesList.clear();
-
-
-        //接受数据
         Intent intent = getIntent();
-        List<Picture> listfromPicture = (List<Picture>) intent.getSerializableExtra("PictureList");
-        if(listfromPicture.size() != 0){
-            picturesList.addAll(listfromPicture);
+        List<Picture> mPictureList=  (List<Picture>)intent.getSerializableExtra("PictureList");
+        if(mPictureList != null){
+            picturesList.addAll(mPictureList);
         }
 
+        initView();
+        //各种监控事件
+        monitor();
 
+    }
+
+    public void initView(){
         topBar = (TopBar) findViewById(R.id.cofActivityTopBar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
 
         head_img = (ImageView) findViewById(R.id.cof_activity_head_img);
+        if(MainUser.getInstance().getImageId() == -1){
+            head_img.setImageResource(MainUser.getInstance().getImageId());
+        }
+        else{
+            head_img.setImageBitmap(MainUser.getInstance().getImageBitMap());
+        }
         head_img.setImageResource(MainUser.getInstance().getImageId());
         head_name = (TextView) findViewById(R.id.cof_activity_head_name);
         head_name.setText(MainUser.getInstance().getUser_name());
@@ -133,20 +150,20 @@ public class CofActivity extends AppCompatActivity {
         lp.height=height;
         linearLayout.setLayoutParams(lp);
         recyclerView.setAdapter(adapter);
-
-        //各种监控事件
-        monitor();
-
     }
-
     private void monitor(){
         topBar = (TopBar) findViewById(R.id.cofActivityTopBar);
         ImageView head_photo = (ImageView) findViewById(R.id.cof_activity_head_photo);
+
 
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
             //返回按钮
             public void leftClicked() {
+                Intent intent = new Intent(CofActivity.this, IndexActivity.class);
+                Cof cof = null;
+                intent.putExtra("cof",cof);
+                setResult(StaticConstant.GETCOF_FROM_NEW,intent);
                 finish();
             }
 
@@ -159,6 +176,8 @@ public class CofActivity extends AppCompatActivity {
                     Intent intent = new Intent(CofActivity.this, IndexActivity.class);
                     intent.putExtra("id",3);
                     intent.putExtra("cof",cof);
+                    setResult(StaticConstant.GETCOF_FROM_NEW,intent);
+                    intent.setFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 }
                 else{
@@ -188,12 +207,14 @@ public class CofActivity extends AppCompatActivity {
                                 break;
                             case 1:
                                 //从应用图库中寻找
-                                Intent intent_1 = new Intent(CofActivity.this,LookForImages.class);
-                                startActivity(intent_1);
+                                Intent intent_1 = new Intent(getApplicationContext(),LookForImages.class);
+                                startActivityForResult(intent_1,1);
                                 break;
                             case 2:
                                 //从本地图库寻找
-                                Toast.makeText(getContent(),"从本地图库中寻找",Toast.LENGTH_SHORT).show();
+                                Intent intent_2 = new Intent(Intent.ACTION_PICK,
+                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                startActivityForResult(intent_2, 2);
                                 break;
                             default:
                                 break;
@@ -204,6 +225,7 @@ public class CofActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
 
@@ -218,7 +240,7 @@ public class CofActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         switch (requestCode){
-            case 0:
+            case StaticConstant.GETBITMAP_FROM_CAMERA:
                 /*byte[] bitmapByteArray = data.getByteArrayExtra("imgBitmap");
                 if (bitmapByteArray!=null) {
                     picturesList.add(new Picture(
@@ -227,9 +249,68 @@ public class CofActivity extends AppCompatActivity {
                 }*/
                 String bitmapPath = data.getStringExtra("BitmapPath");
                 if (bitmapPath!=null){
-                    adapter.addPicture(new Picture(GetBitmap.getBitmapFromSD(bitmapPath)));
+                    picturesList.add(new Picture(GetBitmap.getBitmapFromSD(bitmapPath)));
+                }
+                initView();
+                break;
+            case StaticConstant.GETBITMAP_FROM_APP:
+                List<Picture> mPictureList=  (List<Picture>)data.getSerializableExtra("LookForPictureList");
+                if(mPictureList != null){
+                    adapter.addAllPicture(mPictureList);
+                }
+                initView();
+                break;
+            case StaticConstant.GETBITMAP_FROM_SD:
+                if (resultCode==RESULT_OK && data!=null) {
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumns = {MediaStore.Images.Media.DATA};
+                    Cursor c = getContentResolver().query(selectedImage, filePathColumns, null, null, null);
+                    c.moveToFirst();
+                    int columnIndex = c.getColumnIndex(filePathColumns[0]);
+                    String imagePath = c.getString(columnIndex);
+                    picturesList.add(new Picture(GetBitmap.getBitmapFromSD(imagePath)));
+                    c.close();
+                    initView();
                 }
                 break;
+
         }
+    }
+
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if(ev.getAction()==MotionEvent.ACTION_DOWN){
+            View v=getCurrentFocus();
+            boolean  hideInputResult =isShouldHideInput(v,ev);
+            if(hideInputResult){
+                v.clearFocus();
+                InputMethodManager imm = (InputMethodManager) CofActivity.this
+                        .getSystemService(Activity.INPUT_METHOD_SERVICE);
+                if(v != null){
+                    if(imm.isActive()){
+                        imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+    public  boolean isShouldHideInput(View v, MotionEvent event) {
+        if (v != null && (v instanceof EditText)) {
+            int[] leftTop = { 0, 0 };
+            //获取输入框当前的location位置
+            v.getLocationInWindow(leftTop);
+            int left = leftTop[0];
+            int top = leftTop[1];
+            int bottom = top + v.getHeight();
+            int right = left + v.getWidth();
+            if (event.getRawX() > left && event.getRawX() < right
+                    && event.getRawY() > top && event.getRawY() < bottom) {
+                // 点击的是输入框区域，保留点击EditText的事件
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 }

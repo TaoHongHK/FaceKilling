@@ -27,6 +27,12 @@ public class ReviewAdapter extends ArrayAdapter<Review>{
         ImageView reviewImage = (ImageView) view.findViewById(R.id.review_img);
         TextView reviewContent = (TextView) view.findViewById(R.id.review_content);
         reviewImage.setImageResource(review.getUser().getImageId());
+        if(review.getUser().getImageId() == -1){
+            reviewImage.setImageBitmap(review.getUser().getImageBitMap());
+        }
+        else{
+            reviewImage.setImageResource(review.getUser().getImageId());
+        }
         reviewContent.setText(review.getContent());
         return view;
     }

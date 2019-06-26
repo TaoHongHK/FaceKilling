@@ -61,8 +61,17 @@ public class PictureAdapater extends RecyclerView.Adapter<PictureAdapater.ViewHo
     public void addPicture(Picture picture){
         mPictureList.add(picture);
         this.notifyItemInserted(mPictureList.size()-1);
+        notifyDataSetChanged();
+    }
+    public void addAllPicture(List<Picture> pictures){
+        mPictureList.addAll(pictures);
+        this.notifyItemInserted(mPictureList.size()-1);
+        notifyDataSetChanged();
     }
 
+    public List<Picture> getmPictureList() {
+        return mPictureList;
+    }
 
     @NonNull
     @Override
@@ -78,7 +87,13 @@ public class PictureAdapater extends RecyclerView.Adapter<PictureAdapater.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Picture picture = mPictureList.get(position);
-        Glide.with(mContext).load(picture.getImageId()).into(holder.pictureImage);
+        if(picture.getImageId() == -1){
+            holder.pictureImage.setImageBitmap(picture.getImageBitMap());
+        }
+        else{
+            Glide.with(mContext).load(picture.getImageId()).into(holder.pictureImage);
+        }
+
 
         //长按事件
         holder.pictureImage.setOnLongClickListener(new View.OnLongClickListener() {

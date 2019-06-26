@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.AddFriendsActivity">
+
+    <com.example.facekilling.customviews.TopBar
+        android:id="@+id/activity_add_friend_topBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/FaceKillingTopBarHeight"
+        app:title="添加朋友">
+    </com.example.facekilling.customviews.TopBar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:src="@drawable/search"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:hint="@string/searchHint"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"/>
+    </LinearLayout>
+
+</LinearLayout>

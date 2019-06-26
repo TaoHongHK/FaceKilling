@@ -1,6 +1,7 @@
 package com.example.facekilling.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,15 +16,20 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
+import com.example.facekilling.activities.AddFriendsActivity;
 import com.example.facekilling.customviews.TopBar;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +43,7 @@ public class Index_TwoFragment extends Fragment {
     private ViewPager mViewPager;
     private TextView friTv;
     private TextView chatTv;
-    private List<Fragment> fragments = new ArrayList<>();
+    private SparseArray<Fragment> fragments = new SparseArray<>();
 
     private MyStatePageAdapter myStatePageAdapter;
 
@@ -70,14 +76,24 @@ public class Index_TwoFragment extends Fragment {
 
             @Override
             public void rightClicked() {
+                PopupMenu popupMenu = new PopupMenu(getContext(),topBar.getRightButt());
+                popupMenu.getMenuInflater().inflate(R.menu.add_friend_menu,popupMenu.getMenu());
+                popupMenu.show();
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        onPopItemSelected(item);
+                        return false;
+                    }
+                });
             }
         });
         mViewPager = (ViewPager) mView.findViewById(R.id.index_viewPager);
         friTv = (TextView) mView.findViewById(R.id.fri_page_nav_tv);
         chatTv = (TextView) mView.findViewById(R.id.chat_page_nav_tv);
         Fri_ViewPagerFragment fri_viewPagerFragment = new Fri_ViewPagerFragment();
-        fragments.add(fri_viewPagerFragment);
-        fragments.add(new Chat_DefaultFragment());
+        fragments.put(0,fri_viewPagerFragment);
+        fragments.put(1,new Chat_DefaultFragment());
         mViewPager.setCurrentItem(0);
         friTv.setBackgroundResource(R.drawable.blank);
         friTv.setOnClickListener(new View.OnClickListener() {
@@ -121,12 +137,37 @@ public class Index_TwoFragment extends Fragment {
             @Override
             public void onItemClicked(String userName) {
                 fragments.remove(fragments.size()-1);
-                fragments.add(Chat_ViewPagerFragment.newInstance(userName));
+                fragments.put(1,Chat_ViewPagerFragment.newInstance(userName));
                 myStatePageAdapter.notifyDataSetChanged();
                 swichViewPage(1);
             }
         });
         mViewPager.setAdapter(myStatePageAdapter);
+    }
+
+    public void onPopItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.add_friend:
+                //加好友
+                Intent intent = new Intent(getContext(), AddFriendsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.sao_yi_sao:
+                //扫一扫
+                IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity());
+                // 开始扫描
+                intentIntegrator.initiateScan();
+                //扫描结果
+
+
+                break;
+            case R.id.produce_erweima:
+                //生成我的二维码
+
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -148,6 +189,22 @@ public class Index_TwoFragment extends Fragment {
             }
         }
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // 获取解析结果
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        Log.d("result", "onActivityResult: "+result);
+        if (result != null) {
+            if (result.getContents() == null) {
+                Toast.makeText(getActivity(), "取消扫描", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), "扫描内容:" + result.getContents(), Toast.LENGTH_LONG).show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     class MyStatePageAdapter extends FragmentStatePagerAdapter{
@@ -173,4 +230,5 @@ public class Index_TwoFragment extends Fragment {
         }
 
     }
+
 }

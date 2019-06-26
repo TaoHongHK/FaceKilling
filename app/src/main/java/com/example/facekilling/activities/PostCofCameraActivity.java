@@ -55,6 +55,7 @@ public class PostCofCameraActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cof_camera);
+        isCameraing = true;
         initView();
     }
 
@@ -74,7 +75,6 @@ public class PostCofCameraActivity extends Activity{
             public void surfaceCreated(SurfaceHolder holder) { //SurfaceView创建
                 // 初始化Camera
                 initFrontCamera();
-                isCameraing = true;
             }
 
             @Override
@@ -252,9 +252,9 @@ public class PostCofCameraActivity extends Activity{
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null && iv_show != null && iv_show.getVisibility() == View.GONE) {
                 changeShowingViews();
+                savePic(bitmap);
                 iv_show.setImageBitmap(bitmap);
             }
-            savePic(bitmap);
         }
     };
 
@@ -338,7 +338,6 @@ public class PostCofCameraActivity extends Activity{
             chosenButt.setVisibility(View.VISIBLE);
             iv_show.setVisibility(View.VISIBLE);
         }else{
-            mCamera.startPreview();
             mSurfaceView.setVisibility(View.VISIBLE);
             flipCamera.setVisibility(View.VISIBLE);
             takePicButt.setVisibility(View.VISIBLE);

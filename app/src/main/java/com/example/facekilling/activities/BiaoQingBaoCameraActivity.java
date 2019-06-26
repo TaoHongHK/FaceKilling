@@ -67,6 +67,7 @@ public class BiaoQingBaoCameraActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_biaoqingbao_camera);
         initView();
+        isCameraing = true;
         rightLowerButton();
     }
 
@@ -84,7 +85,6 @@ public class BiaoQingBaoCameraActivity extends Activity {
             public void surfaceCreated(SurfaceHolder holder) { //SurfaceView创建
                 // 初始化Camera
                 initFrontCamera();
-                isCameraing = true;
             }
 
             @Override
@@ -93,10 +93,6 @@ public class BiaoQingBaoCameraActivity extends Activity {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) { //SurfaceView销毁
-                // 释放Camera资源
-                if (mCamera != null) {
-                    stopCamera();
-                }
             }
         });
         //设置点击监听
@@ -247,11 +243,10 @@ public class BiaoQingBaoCameraActivity extends Activity {
             matrix.setRotate(-90);
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null && iv_show != null && iv_show.getVisibility() == View.GONE) {
-                mCamera.stopPreview();
-                changeShowingViews(isCameraing);
                 iv_show.setImageBitmap(bitmap);
+                savePic(bitmap);
+                changeShowingViews();
             }
-            savePic(bitmap);
         }
     };
 
@@ -302,11 +297,10 @@ public class BiaoQingBaoCameraActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (iv_show.getVisibility()==View.GONE){
+            stopCamera();
             super.onBackPressed();
         }else {
-            changeShowingViews(isCameraing);
-            isCameraing = !isCameraing;
-            mCamera.startPreview();
+            changeShowingViews();
         }
     }
 
@@ -326,8 +320,9 @@ public class BiaoQingBaoCameraActivity extends Activity {
         }
     }
 
-    public void changeShowingViews(boolean cameraing){
-        if (cameraing){
+    public void changeShowingViews(){
+        if (isCameraing){
+            mCamera.stopPreview();
             mSurfaceView.setVisibility(View.GONE);
             flipCamera.setVisibility(View.GONE);
             takePicButt.setVisibility(View.GONE);

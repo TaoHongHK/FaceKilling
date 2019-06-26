@@ -46,13 +46,13 @@ public class Fri_ViewPagerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = getContext();
         mView = inflater.inflate(R.layout.fragment_fri_viewpager,container,false);
+        initUsers();
         initView();
         Log.d("friviewpager", "onCreateView: ");
         return mView;
     }
 
     public void initView(){
-        initUsers();
         FriendAdapter adapter = new FriendAdapter(getContext(), R.layout.friend_item, userList);
         final ListView listview = (ListView) mView.findViewById(R.id.list_view);
         listview.setAdapter(adapter);
@@ -64,7 +64,7 @@ public class Fri_ViewPagerFragment extends Fragment {
         });
     }
 
-    private void  initUsers() {
+    public void  initUsers() {
         Friend user_1 = new Friend("张三", R.drawable.touxiang_1,"上海北京");
         userList.add(user_1);
         Friend user_2 = new Friend("李四", R.drawable.touxiang_2, "qinyuf");

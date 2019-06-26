@@ -1,11 +1,14 @@
 package com.example.facekilling.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -60,22 +63,23 @@ public class LoginActivity extends AppCompatActivity {
             onLoginFailed();
             return;
         }*/
+        String email = emailText.getText().toString();
+        String password = passwordText.getText().toString();
+        //创建登录用户类
+//        MainUser mainUser = MainUser.getInstance(email,password);
+        MainUser mainUser = MainUser.newInstance("帅锅",R.drawable.picture_13,"12345678@163.com");
         loginButton.setEnabled(false);
         /*final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
                 R.style.AppTheme);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");
-        progressDialog.show();*/
+        progressDialog.show();
 
-        String email = emailText.getText().toString();
-        String password = passwordText.getText().toString();
-        //创建登录用户类
-//        MainUser mainUser = MainUser.getInstance(email,password);
-        MainUser mainUser = MainUser.getInstance("帅锅",R.drawable.picture_13,"12345678@163.com");
+
 
         // TODO: authentication logic here.
 
-        /*new android.os.Handler().postDelayed(
+        new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
                         // On complete call either onLoginSuccess or onLoginFailed
@@ -133,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             emailText.setError(null);
         }
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
+        if (password.isEmpty() || password.length() < 4 || password.length() > 50) {
             passwordText.setError("between 4 and 10 alphanumeric characters");
             valid = false;
         } else {
@@ -141,4 +145,15 @@ public class LoginActivity extends AppCompatActivity {
         }
         return valid;
     }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        InputMethodManager imm =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(imm != null) {
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+
 }

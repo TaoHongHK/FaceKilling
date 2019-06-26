@@ -20,7 +20,7 @@ public class Cof implements Serializable {
     public Cof(User user,String content){
         this.user = user;
         this.content = content;
-        this.date = new Date();;
+        this.date = new Date();
         this.imagesList = new ArrayList<>();
         initPictures();
         this.praise_num=0;
@@ -31,7 +31,7 @@ public class Cof implements Serializable {
     public Cof(User user,String content,List<Picture> imagesList){
         this.user = user;
         this.content = content;
-        this.date = new Date();;
+        this.date = new Date();
         this.imagesList = new ArrayList<>();
         this.imagesList.addAll(imagesList);
         this.praise_num=0;

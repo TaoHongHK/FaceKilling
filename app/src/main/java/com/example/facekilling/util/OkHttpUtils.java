@@ -4,60 +4,78 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import org.json.JSONObject;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OkHttpUtils {
-    private static final String URL1 = "http://10.13.7.78:8000/test_get/?get=abv";
-    private static final String URL3 = "http://127.0.0.1:8000/test_img/";
+    private static final String URL = "http://10.14.172.15:8000/face/attribute/";
 
-    private static OkHttpUtils okHttpUtils = new OkHttpUtils();
-    private OkHttpClient client;
-    private Request request;
-    private Response response;
-    private FileInputStream fileInputStream;
-    private Bitmap bitmap;
+    private static OkHttpClient client = new OkHttpClient();
 
-    public OkHttpUtils(){
-        this.client = new OkHttpClient();
-    }
 
-    public static OkHttpUtils getInstance(){
-        return okHttpUtils;
-    }
-
-   /* public Bitmap getBitmap(){
-        Request request = new Request.Builder().url(URL).post().build();
-        try {
-            Response response= client.newCall(request).execute();
-            fileInputStream = new FileInputStream(response.toString());
-            bitmap = BitmapFactory.decodeStream(fileInputStream);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return bitmap;
+   /* public static boolean LogIn(String email,String password){
+        Request request = null;
     }*/
 
-    public String getSometing(){
-        String theReturn =null;
-        request = new Request.Builder().url(URL1).build();
-        Call call = client.newCall(request);
+    public static String YanZhiPost(String path){
+        Log.d("yanzhiUpload", "YanZhiPost: in"+path);
+        Request request = null;
+        Response response = null;
         try {
-            response = call.execute();
-            theReturn = response.body().string();
-        }catch (IOException ie){
-            ie.printStackTrace();
-        }finally{
-            if (response.body()!=null){
-                response.body().close();
+            MultipartBody.Builder builder = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart(
+                            "id",
+                            "2")
+                    .addFormDataPart(
+                            "image",
+                             path,
+                             RequestBody.create(MediaType.parse("image/jpg"), new File(path)));
+            Log.d("yanzhiUpload", "YanZhiPost: "+path);
+            RequestBody requestBody = builder.build();
+
+            request = new Request.Builder()
+                    .url(URL)
+                    .post(requestBody)
+                    .build();
+            Call call = client.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.e("upload image", "上传失败:"+e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.body()!=null){
+                        String json = response.body().string();
+                        Log.e("upload image", "上传成功:"+json);
+                    }
+
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (response!=null&&response.body()!=null){
+                response.close();
             }
         }
-        return theReturn;
+        return null;
     }
+
+
 
 }

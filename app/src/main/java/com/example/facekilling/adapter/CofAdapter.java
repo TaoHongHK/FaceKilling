@@ -106,7 +106,14 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
 
     public void onBindViewHolder(@NonNull CofAdapter.ViewHolder holder, int position) {
         Cof cof = mCofList.get(position);
-        Glide.with(mContext).load(cof.getUser().getImageId()).into(holder.headimage);
+        //方便测试
+        if(cof.getUser().getImageId() == -1){
+            holder.headimage.setImageBitmap(cof.getUser().getImageBitMap());
+        }
+        else{
+            Glide.with(mContext).load(cof.getUser().getImageId()).into(holder.headimage);
+        }
+
         holder.head_name.setText(cof.getUser().getUser_name());
         holder.content.setText(cof.getContent());
 

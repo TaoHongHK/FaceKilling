@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.UiThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -22,10 +23,12 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
 import com.example.facekilling.util.GetSysTime;
+import com.example.facekilling.util.OkHttpUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,13 +49,18 @@ public class YanZhiCameraActivity extends Activity {
     private int usingCamera;
     private Button takePicButt;
     private Button flipCamera;
+    private Button upLoadButt;
+    private String imgString;
+    private TextView scoreTextView;
     private boolean isCameraing;
+    private String scroeString;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_yanzhi_camera);
+        isCameraing = true;
         initView();
     }
 
@@ -60,6 +68,8 @@ public class YanZhiCameraActivity extends Activity {
         iv_show = (ImageView) findViewById(R.id.yz_iv_show_camera);
         takePicButt = (Button) findViewById(R.id.yz_take_pic_butt);
         flipCamera = (Button) findViewById(R.id.yz_flip_camera);
+        upLoadButt = (Button) findViewById(R.id.yz_upload_butt);
+        scoreTextView = (TextView) findViewById(R.id.yz_get_score);
         initCameraInfo();
         askForPermission();
         mSurfaceView = (SurfaceView) findViewById(R.id.yz_surface_view_camera);
@@ -70,7 +80,6 @@ public class YanZhiCameraActivity extends Activity {
             public void surfaceCreated(SurfaceHolder holder) { //SurfaceView创建
                 // 初始化Camera
                 initFrontCamera();
-                isCameraing = true;
             }
 
             @Override
@@ -79,10 +88,6 @@ public class YanZhiCameraActivity extends Activity {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) { //SurfaceView销毁
-                // 释放Camera资源
-                if (mCamera != null) {
-                    stopCamera();
-                }
             }
         });
         //设置点击监听
@@ -113,6 +118,29 @@ public class YanZhiCameraActivity extends Activity {
                 changeCamera();
             }
         });
+
+        upLoadButt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (iv_show.getVisibility()==View.VISIBLE && imgString!=null){
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("yanzhiUpload", "onClick: nowIn");
+                            scroeString = OkHttpUtils.YanZhiPost(imgString);
+                            Log.d("yanzhiUpload", "onClick: "+scroeString);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    scoreTextView.setText(scroeString);
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+
     }
 
     public void initCameraInfo(){
@@ -233,11 +261,10 @@ public class YanZhiCameraActivity extends Activity {
             matrix.setRotate(-90);
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null && iv_show != null && iv_show.getVisibility() == View.GONE) {
-                mCamera.stopPreview();
-                changeShowingViews(isCameraing);
                 iv_show.setImageBitmap(bitmap);
+                savePic(bitmap);
+                changeShowingViews();
             }
-            savePic(bitmap);
         }
     };
 
@@ -265,6 +292,7 @@ public class YanZhiCameraActivity extends Activity {
                     MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
                     Uri uri = Uri.fromFile(picFile);
                     sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+                    imgString = picFile.getPath();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } finally {
@@ -281,18 +309,14 @@ public class YanZhiCameraActivity extends Activity {
         }).start();
     }
 
-    public Activity getActivity(){
-        return this;
-    }
 
     @Override
     public void onBackPressed() {
         if (iv_show.getVisibility()==View.GONE){
+            stopCamera();
             super.onBackPressed();
         }else {
-            changeShowingViews(isCameraing);
-            isCameraing = !isCameraing;
-            mCamera.startPreview();
+            changeShowingViews();
         }
     }
 
@@ -307,22 +331,33 @@ public class YanZhiCameraActivity extends Activity {
                 == PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
         } else {
-            ActivityCompat.requestPermissions(getActivity(),
+            ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+        }
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.INTERNET)
+                == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET}, 3);
         }
     }
 
-    public void changeShowingViews(boolean cameraing){
-        if (cameraing){
+    public void changeShowingViews(){
+        if (isCameraing){
+            mCamera.stopPreview();
             mSurfaceView.setVisibility(View.GONE);
             flipCamera.setVisibility(View.GONE);
             takePicButt.setVisibility(View.GONE);
             iv_show.setVisibility(View.VISIBLE);
+            upLoadButt.setVisibility(View.VISIBLE);
+            scoreTextView.setVisibility(View.VISIBLE);
         }else{
             mSurfaceView.setVisibility(View.VISIBLE);
             flipCamera.setVisibility(View.VISIBLE);
             takePicButt.setVisibility(View.VISIBLE);
             iv_show.setVisibility(View.GONE);
+            upLoadButt.setVisibility(View.GONE);
+            scoreTextView.setVisibility(View.GONE);
         }
         isCameraing = !isCameraing;
     }

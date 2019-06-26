@@ -1,5 +1,6 @@
 package com.example.facekilling.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,14 +11,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
+import com.example.facekilling.activities.CofActivity;
 import com.example.facekilling.adapter.ChatMessageAdapter;
 import com.example.facekilling.javabean.ChatMessage;
 import com.example.facekilling.util.ConnectToServer;
@@ -99,6 +103,7 @@ public class Chat_ViewPagerFragment extends Fragment {
             }
         });
     }
+
 
 
     class MyHandle extends Handler{

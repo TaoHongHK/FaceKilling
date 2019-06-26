@@ -2,6 +2,7 @@ package com.example.facekilling.customviews;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Dimension;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
@@ -125,6 +126,8 @@ public class TopBar extends LinearLayout {
         }
         if(leftButtIcon != -1){
             leftButt.setBackgroundResource(leftButtIcon);
+        }else {
+            leftButt.setBackgroundResource(R.drawable.back);
         }
         leftTv.setOnClickListener(new OnClickListener() {
             @Override
@@ -139,7 +142,8 @@ public class TopBar extends LinearLayout {
         leftButt.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.leftClicked();
+                if(clickListener!=null)
+                    clickListener.leftClicked();
             }
         });
 
@@ -159,7 +163,8 @@ public class TopBar extends LinearLayout {
         rightTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.rightClicked();
+                if(clickListener!=null)
+                    clickListener.rightClicked();
             }
         });
 
