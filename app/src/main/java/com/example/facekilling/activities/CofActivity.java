@@ -202,19 +202,19 @@ public class CofActivity extends AppCompatActivity {
                         switch(which){
                             case 0:
                                 //拍摄照片
-                                Intent intent = new Intent(getApplicationContext(),PostCofCameraActivity.class);
-                                startActivityForResult(intent,0);
+                                Intent intent = new Intent(getApplicationContext(),FaceKCamera.class);
+                                startActivityForResult(intent,StaticConstant.GETBITMAP_FROM_CAMERA);
                                 break;
                             case 1:
                                 //从应用图库中寻找
                                 Intent intent_1 = new Intent(getApplicationContext(),LookForImages.class);
-                                startActivityForResult(intent_1,1);
+                                startActivityForResult(intent_1,StaticConstant.GETBITMAP_FROM_APP);
                                 break;
                             case 2:
                                 //从本地图库寻找
                                 Intent intent_2 = new Intent(Intent.ACTION_PICK,
                                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent_2, 2);
+                                startActivityForResult(intent_2, StaticConstant.GETBITMAP_FROM_SD);
                                 break;
                             default:
                                 break;
@@ -247,7 +247,7 @@ public class CofActivity extends AppCompatActivity {
                             BitmapFactory.decodeByteArray(bitmapByteArray, 0, bitmapByteArray.length)));
                     adapter.notifyDataSetChanged();
                 }*/
-                String bitmapPath = data.getStringExtra("BitmapPath");
+                String bitmapPath = data.getStringExtra(StaticConstant.BITMAP_PATH);
                 if (bitmapPath!=null){
                     picturesList.add(new Picture(GetBitmap.getBitmapFromSD(bitmapPath)));
                 }

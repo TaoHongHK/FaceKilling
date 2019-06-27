@@ -1,6 +1,8 @@
 package com.example.facekilling.activities;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,35 +12,47 @@ import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
-import com.example.facekilling.util.BitMap2Util;
+import com.example.facekilling.util.GetBitmap;
 import com.example.facekilling.util.GetSysTime;
 import com.example.facekilling.util.StaticConstant;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
+import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class PostCofCameraActivity extends Activity{
+import static com.oguzdev.circularfloatingactionmenu.library.SubActionButton.THEME_DARKER;
+
+public class FaceKCamera extends AppCompatActivity {
+
+    private static final int CAMERA_WHAT = 1;
+    private SavePicCallBackHandle savePicCallBackHandle;
 
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
-    private ImageView iv_show;
     private int viewWidth, viewHeight;
     private int frontCameraId;
     private int backCameraId;
@@ -54,20 +68,23 @@ public class PostCofCameraActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cof_camera);
+        setContentView(R.layout.activity_face_kcamera);
+        if(getIntent().getBooleanExtra(StaticConstant.FUNCTIONBUTT_REQUEST,false)){
+            SetFunctionButton();
+        }
+        savePicCallBackHandle = new SavePicCallBackHandle(this);
         isCameraing = true;
         initView();
     }
 
     private void initView() {
-        iv_show = (ImageView) findViewById(R.id.pc_iv_show_camera);
-        takePicButt = (Button) findViewById(R.id.pc_take_pic_butt);
-        flipCamera = (Button) findViewById(R.id.pc_flip_camera);
-        reTakeButt = (Button) findViewById(R.id.activity_cof_camera_reTakeButt);
-        chosenButt = (Button) findViewById(R.id.activity_cof_camera_chosenButt);
+        takePicButt = (Button) findViewById(R.id.camera_take_pic_butt);
+        flipCamera = (Button) findViewById(R.id.camera_flip_camera);
+        reTakeButt = (Button) findViewById(R.id.camera_reTakeButt);
+        chosenButt = (Button) findViewById(R.id.camera_chosenButt);
         initCameraInfo();
-        askForPermission();
-        mSurfaceView = (SurfaceView) findViewById(R.id.pc_surface_view_camera);
+        GetBitmap.askForStorePermission(getActivity(),getApplicationContext());
+        mSurfaceView = (SurfaceView) findViewById(R.id.camera_surface_view_camera);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         mSurfaceHolder.addCallback(new SurfaceHolder.Callback() {
@@ -95,7 +112,9 @@ public class PostCofCameraActivity extends Activity{
                 mCamera.autoFocus(new Camera.AutoFocusCallback() {
                     @Override
                     public void onAutoFocus(boolean success, Camera camera) {
-                        Toast.makeText(getApplicationContext(),"聚焦",Toast.LENGTH_SHORT).show();
+                        Toast toast = Toast.makeText(getApplicationContext(),"聚焦",Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.TOP,0,0);
+                        toast.show();
                     }
                 });
             }
@@ -126,9 +145,9 @@ public class PostCofCameraActivity extends Activity{
             public void onClick(View v) {
                 Intent intent = new Intent();
                 /*intent.putExtra("imgBitmap", BitMap2Util.BitMap2ByteArray(mBitMap));*/
-                intent.putExtra("BitmapPath",mBitMapPath);
-                PostCofCameraActivity.this.setResult(StaticConstant.GETBITMAP_FROM_CAMERA,intent);
-                PostCofCameraActivity.this.finish();
+                intent.putExtra(StaticConstant.BITMAP_PATH,mBitMapPath);
+                FaceKCamera.this.setResult(StaticConstant.CAMERA_RETURN,intent);
+                FaceKCamera.this.finish();
             }
         });
     }
@@ -250,9 +269,8 @@ public class PostCofCameraActivity extends Activity{
             final Matrix matrix = new Matrix();
             matrix.setRotate(-90);
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
-            if (bitmap != null && iv_show != null && iv_show.getVisibility() == View.GONE) {
-                changeShowingViews();
-                iv_show.setImageBitmap(bitmap);
+            if (bitmap != null) {
+                savePic(bitmap);
             }
         }
     };
@@ -280,7 +298,7 @@ public class PostCofCameraActivity extends Activity{
                     MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
                     Uri uri = Uri.fromFile(picFile);
                     sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
-                    mBitMapPath = picFile.getPath();
+                    savePicCallBackHandle.obtainMessage(CAMERA_WHAT,picFile.getAbsolutePath()).sendToTarget();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } finally {
@@ -303,27 +321,11 @@ public class PostCofCameraActivity extends Activity{
 
     @Override
     public void onBackPressed() {
-        if (iv_show.getVisibility()==View.GONE){
+        if (mSurfaceView.getVisibility()==View.VISIBLE){
             stopCamera();
             super.onBackPressed();
         }else {
             changeShowingViews();
-        }
-    }
-
-    public void askForPermission(){
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA}, 1);
-        }
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
         }
     }
 
@@ -335,16 +337,145 @@ public class PostCofCameraActivity extends Activity{
             takePicButt.setVisibility(View.GONE);
             reTakeButt.setVisibility(View.VISIBLE);
             chosenButt.setVisibility(View.VISIBLE);
-            iv_show.setVisibility(View.VISIBLE);
         }else{
             mSurfaceView.setVisibility(View.VISIBLE);
             flipCamera.setVisibility(View.VISIBLE);
             takePicButt.setVisibility(View.VISIBLE);
             reTakeButt.setVisibility(View.GONE);
             chosenButt.setVisibility(View.GONE);
-            iv_show.setVisibility(View.GONE);
         }
         isCameraing = !isCameraing;
     }
 
+    public void setBitmapPath(String bitmapPath){
+        mBitMapPath = bitmapPath;
+    }
+
+    private class SavePicCallBackHandle extends Handler{
+        private FaceKCamera faceKCamera;
+        private String bitmapPath;
+
+        public SavePicCallBackHandle(FaceKCamera faceKCamera){
+            this.faceKCamera = faceKCamera;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what==CAMERA_WHAT){
+                bitmapPath = (String) msg.obj;
+                Log.i("Mlogin",bitmapPath);
+                if (bitmapPath!=null){
+                    faceKCamera.setBitmapPath(bitmapPath);
+                    changeShowingViews();
+                }
+            }
+        }
+    }
+
+
+    public void SetFunctionButton() {
+        final ImageView fabIconNew = new ImageView(this);
+        // 设置菜单按钮Button的图标
+        fabIconNew.setImageResource(R.drawable.settings_menu);
+        final FloatingActionButton rightLowerButton = new FloatingActionButton.Builder(FaceKCamera.this).setContentView(fabIconNew).build();
+        //设置悬浮按钮的参数
+        SubActionButton.Builder rLSubBuilder = new SubActionButton.Builder(this);
+        rLSubBuilder.setTheme(THEME_DARKER);
+        FloatingActionButton.LayoutParams pParams = new FloatingActionButton.LayoutParams(
+                150, 150);
+        pParams.setMargins(30,
+                30, 30,
+                30);
+
+        rLSubBuilder.setLayoutParams(pParams);
+        rightLowerButton.setPosition(2,pParams);
+
+        ImageView rlIcon1 = new ImageView(this);
+        ImageView rlIcon2 = new ImageView(this);
+        ImageView rlIcon3 = new ImageView(this);
+        ImageView rlIcon4 = new ImageView(this);
+        // 设置弹出菜单的图标
+
+        rlIcon1.setImageResource(R.drawable.emoji_happy);
+        rlIcon2.setImageResource(R.drawable.emoji_angry);
+        rlIcon3.setImageResource(R.drawable.emoji_sad);
+        rlIcon4.setImageResource(R.drawable.emoji_surprise);
+
+//        // 设置菜单按钮Button的宽、高，边距
+        FloatingActionButton.LayoutParams starParams = new FloatingActionButton.LayoutParams(
+                100, 100);
+        starParams.setMargins(25,
+                25,0,0);
+
+
+        final FloatingActionMenu rightLowerMenu = new FloatingActionMenu.Builder(
+                this)
+                .addSubActionView(rLSubBuilder.setContentView(rlIcon1,starParams).build())
+                .addSubActionView(rLSubBuilder.setContentView(rlIcon2,starParams).build())
+                .addSubActionView(rLSubBuilder.setContentView(rlIcon3,starParams).build())
+                .addSubActionView(rLSubBuilder.setContentView(rlIcon4,starParams).build())
+                .setStartAngle(90).setEndAngle(180)
+                .attachTo(rightLowerButton).build();
+
+        rightLowerMenu.setStateChangeListener(new FloatingActionMenu.MenuStateChangeListener() {
+
+            @Override
+            public void onMenuOpened(FloatingActionMenu menu) {
+                // 逆时针旋转90°
+                fabIconNew.setRotation(0);
+                PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat(
+                        View.ROTATION, -90);
+
+                ObjectAnimator animation = ObjectAnimator
+                        .ofPropertyValuesHolder(fabIconNew, pvhR);
+                animation.start();
+            }
+
+            @Override
+            public void onMenuClosed(FloatingActionMenu menu) {
+                // 顺时针旋转90°
+                fabIconNew.setRotation(-90);
+                PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat(
+                        View.ROTATION, 0);
+                ObjectAnimator animation = ObjectAnimator
+                        .ofPropertyValuesHolder(fabIconNew, pvhR);
+                animation.start();
+
+            }
+        });
+
+        //各种响应
+        //多选
+        rlIcon1.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                rightLowerMenu.close(true);
+            }
+        });
+        //删除
+        rlIcon2.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                rightLowerMenu.close(true);
+            }
+        });
+
+        rlIcon3.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                rightLowerMenu.close(true);
+            }
+        });
+
+        rlIcon4.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                rightLowerMenu.close(true);
+            }
+        });
+    }
 }

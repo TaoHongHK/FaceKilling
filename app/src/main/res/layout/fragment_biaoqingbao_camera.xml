@@ -2,37 +2,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <SurfaceView
-        android:id="@+id/bqb_surface_view_camera"
-        android:layout_width="500dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="0dp" />
-
     <ImageView
-        android:id="@+id/bqb_iv_show_camera"
+        android:id="@+id/biaoqingbao_img"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_centerInParent="true"
-        android:scaleType="centerCrop" />
+        android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/bqb_take_pic_butt"
-        android:layout_width="@dimen/camera_butt_size"
-        android:layout_height="@dimen/camera_butt_size"
-        android:background="@drawable/shape_button"
+        android:id="@+id/biaoqingbao_oneMoreButt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cameraoneMore"
+        android:background="@drawable/shape_post"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"/>
-
-    <Button
-        android:id="@+id/bqb_flip_camera"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/flip_camera"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp" />
 </RelativeLayout>

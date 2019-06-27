@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SurfaceView
+        android:id="@+id/camera_surface_view_camera"
+        android:layout_width="500dp"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/camera_take_pic_butt"
+        android:layout_width="@dimen/camera_butt_size"
+        android:layout_height="@dimen/camera_butt_size"
+        android:background="@drawable/shape_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"/>
+
+    <Button
+        android:id="@+id/camera_flip_camera"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/flip_camera"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/camera_get_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="100dp"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp">
+        <Button
+            android:id="@+id/camera_reTakeButt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/cameraButtOne"
+            android:background="@drawable/shape_post"
+            android:layout_marginHorizontal="10dp"
+            android:visibility="gone"/>
+        <Button
+            android:id="@+id/camera_chosenButt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/cameraButtTwo"
+            android:background="@drawable/shape_post"
+            android:layout_marginHorizontal="15dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+
+
+</RelativeLayout>

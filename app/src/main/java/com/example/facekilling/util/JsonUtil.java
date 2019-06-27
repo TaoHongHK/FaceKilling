@@ -45,7 +45,7 @@ public class JsonUtil {
             JSONObject jsonObject1 = new JSONObject(jsonObject.getString("friendID"));
             int num  = jsonObject1.getInt("num");
             if(num!=0){
-                JSONArray friendIDArray = jsonObject.getJSONObject("friendID").getJSONArray("friendID");
+                JSONArray friendIDArray = jsonObject1.getJSONArray("friendID");
                 for (int i = 0;i<friendIDArray.length();i++){
                     friendsList.add((Integer)friendIDArray.get(i));
                 }
@@ -100,5 +100,14 @@ public class JsonUtil {
         }
 
         return result;
+    }
+
+    public static int decodeErrorFronJson(String JsonInfo)throws Exception{
+        int error = -1;
+        if (!"".equals(JsonInfo) && JsonInfo != null) {
+            JSONObject json = new JSONObject(JsonInfo);
+            error = json.getInt("error");
+        }
+        return error;
     }
 }

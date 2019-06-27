@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.facekilling">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,7 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.AddFriendsActivity"></activity>
+        <activity android:name=".activities.FaceKCamera"></activity>
+        <activity android:name=".activities.AddFriendsActivity" />
         <activity android:name=".activities.ProfileActivity" />
         <activity
             android:name=".activities.IndexActivity"
@@ -30,7 +32,6 @@
         <activity android:name=".activities.YanZhiCameraActivity" />
         <activity android:name=".activities.CofActivity" />
         <activity android:name=".activities.MyCofActivity" />
-        <activity android:name=".activities.PostCofCameraActivity" />
         <activity android:name=".activities.LookForImages" />
         <activity
             android:name=".activities.LoginActivity"

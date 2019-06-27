@@ -7,4 +7,7 @@
     <string name="viewpager_two">消息</string>
     <string name="menu_pictures_name">pictures</string>
     <string name="searchHint">邮箱</string>
+    <string name="cameraButtOne">重拍</string>
+    <string name="cameraButtTwo">就选这张</string>
+    <string name="cameraoneMore">再来一次</string>
 </resources>

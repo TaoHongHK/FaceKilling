@@ -69,7 +69,6 @@ public class LoginActivity extends AppCompatActivity {
                 // Start the Signup activity
                 Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
                 startActivityForResult(intent, REQUEST_SIGNUP);
-                finish();
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
@@ -89,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
                         Bitmap female_bit = BitmapFactory.decodeResource(getResources(), R.drawable.female_avatar);
                         female_bit.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
                     } else if (s.equals(user_gender[2])) {
-                        Bitmap unknown_bit = BitmapFactory.decodeResource(getResources(), R.drawable.unknown_avatar);
+                        Bitmap unknown_bit = BitmapFactory.decodeResource(getResources(), R.drawable.unknown);
                         unknown_bit.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
                     }
                 }catch (IOException ie){
@@ -128,8 +127,12 @@ public class LoginActivity extends AppCompatActivity {
             if(msg.what==LOGIN_WHAT){
                 loginResult = (int) msg.obj;
                 Log.i("Mlogin",String.valueOf(loginResult));
-                if (loginResult!=-1){
+                if (loginResult > 0){
                     loginActivity.onLoginSuccess();
+                }else if (loginResult == -1){
+                    loginActivity.onLoginFailed("password wrong!");
+                }else if (loginResult == -2){
+                    loginActivity.onLoginFailed("email wrong!");
                 }else loginActivity.onLoginFailed();
             }
 
@@ -165,8 +168,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     //登陆失败
-    public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed,email or password wrong!", Toast.LENGTH_LONG).show();
+    public void onLoginFailed(String note) {
+        Toast.makeText(getBaseContext(), note, Toast.LENGTH_LONG).show();
+        loginButton.setEnabled(true);
+    }
+
+    public void onLoginFailed(){
+        Toast.makeText(getBaseContext(), "login failed!", Toast.LENGTH_LONG).show();
         loginButton.setEnabled(true);
     }
 

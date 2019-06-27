@@ -1,13 +1,16 @@
 package com.example.facekilling.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -63,8 +66,6 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Finish the registration screen and return to the Login activity
-                Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
-                startActivity(intent);
                 finish();
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
@@ -109,8 +110,13 @@ public class SignupActivity extends AppCompatActivity {
             if(msg.what==SIGN_WHAT){
                 signUpResult = (int) msg.obj;
                 Log.d("Mlogin",String.valueOf(signUpResult));
-                if (signUpResult!=-1){
+                if (signUpResult>0){
                     signupActivity.onSignupSuccess();
+                }else if(signUpResult == -1) {
+                    signupActivity.onSignupFailed("please choose gender from 'male','female' and 'unknown'");
+                }
+                else if (signUpResult==-2){
+                    signupActivity.onSignupFailed("email has been used");
                 }else signupActivity.onSignupFailed();
             }
 
@@ -126,6 +132,11 @@ public class SignupActivity extends AppCompatActivity {
 
     public void onSignupFailed() {
         Toast.makeText(getBaseContext(), "register failed", Toast.LENGTH_LONG).show();
+        signupButton.setEnabled(true);
+    }
+
+    public void onSignupFailed(String note) {
+        Toast.makeText(getBaseContext(), note, Toast.LENGTH_LONG).show();
         signupButton.setEnabled(true);
     }
 
@@ -191,5 +202,14 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        InputMethodManager imm =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(imm != null) {
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+        }
+        return super.dispatchTouchEvent(ev);
     }
 }
