@@ -3,9 +3,15 @@ package com.example.facekilling.activities;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,21 +22,41 @@ import android.widget.Toast;
 
 import com.example.facekilling.R;
 import com.example.facekilling.javabean.MainUser;
+import com.example.facekilling.util.GetSysTime;
+import com.example.facekilling.util.OkHttpUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
+    private static final int LOGIN_WHAT = 1;
+
+    private String[] user_gender = {"male","female","unknown"};
 
     private EditText emailText;
     private EditText passwordText;
     private Button loginButton;
     private TextView signupLink;
+    private LogInHandle logInHandle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setDefaultAvatarsFile(getApplicationContext());
+        logInHandle = new LogInHandle(this);
         initView();
+    }
+
+    public void initView(){
+        this.emailText = (EditText) findViewById(R.id.input_email);
+        this.passwordText = (EditText) findViewById(R.id.input_password);
+        this.loginButton = (Button) findViewById(R.id.btn_login);
+        this.signupLink = (TextView) findViewById(R.id.link_signup);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -49,57 +75,75 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void initView(){
-        this.emailText = (EditText) findViewById(R.id.input_email);
-        this.passwordText = (EditText) findViewById(R.id.input_password);
-        this.loginButton = (Button) findViewById(R.id.btn_login);
-        this.signupLink = (TextView) findViewById(R.id.link_signup);
+    public void setDefaultAvatarsFile(Context context){
+        for (String s : user_gender){
+            String baseFilePath = getFilesDir().getAbsolutePath() + File.separator + s +".jpg";
+            File baseFile = new File(baseFilePath);
+            if (!baseFile.exists()){
+                try {
+                    FileOutputStream fileOutputStream = context.openFileOutput(s+".jpg",MODE_PRIVATE);
+                    if (s.equals(user_gender[0])) {
+                        Bitmap male_bit = BitmapFactory.decodeResource(getResources(), R.drawable.male_avatar);
+                        male_bit.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    } else if (s.equals(user_gender[1])) {
+                        Bitmap female_bit = BitmapFactory.decodeResource(getResources(), R.drawable.female_avatar);
+                        female_bit.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    } else if (s.equals(user_gender[2])) {
+                        Bitmap unknown_bit = BitmapFactory.decodeResource(getResources(), R.drawable.unknown_avatar);
+                        unknown_bit.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    }
+                }catch (IOException ie){
+                    ie.printStackTrace();
+                }
+            }
+        }
     }
-
 
     public void login() {
-        Log.d(TAG, "Login");
-        /*if (!validate()) {
+        if (!validate()) {
             onLoginFailed();
             return;
-        }*/
-        String email = emailText.getText().toString();
-        String password = passwordText.getText().toString();
-        //创建登录用户类
-//        MainUser mainUser = MainUser.getInstance(email,password);
-        MainUser mainUser = MainUser.newInstance("帅锅",R.drawable.picture_13,"12345678@163.com");
+        }
         loginButton.setEnabled(false);
-        /*final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
-                R.style.AppTheme);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Authenticating...");
-        progressDialog.show();
-
-
-
-        // TODO: authentication logic here.
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        onLoginSuccess();
-                        // onLoginFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);*/
-
-        onLoginSuccess();
+        final String email = emailText.getText().toString();
+        final String password = passwordText.getText().toString();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int result = OkHttpUtils.LogIn(email,password);
+                OkHttpUtils.GetMainUserInfo(result);
+                logInHandle.obtainMessage(LOGIN_WHAT,result).sendToTarget();
+            }
+        }).start();
     }
 
+    private static class LogInHandle extends Handler{
+        private LoginActivity loginActivity;
+        private int loginResult = -1;
+        public LogInHandle(LoginActivity loginActivity){
+            this.loginActivity = loginActivity;
+        }
+        @Override
+        public void handleMessage(Message msg){
+            if(msg.what==LOGIN_WHAT){
+                loginResult = (int) msg.obj;
+                Log.i("Mlogin",String.valueOf(loginResult));
+                if (loginResult!=-1){
+                    loginActivity.onLoginSuccess();
+                }else loginActivity.onLoginFailed();
+            }
+
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "registered!",Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.TOP,0,0);
+                toast.show();
             }
         }
     }
@@ -122,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
 
     //登陆失败
     public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Login failed,email or password wrong!", Toast.LENGTH_LONG).show();
         loginButton.setEnabled(true);
     }
 

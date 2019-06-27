@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,6 +26,7 @@ import android.widget.Toast;
 import com.example.facekilling.R;
 import com.example.facekilling.util.BitMap2Util;
 import com.example.facekilling.util.GetSysTime;
+import com.example.facekilling.util.StaticConstant;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -127,7 +127,7 @@ public class PostCofCameraActivity extends Activity{
                 Intent intent = new Intent();
                 /*intent.putExtra("imgBitmap", BitMap2Util.BitMap2ByteArray(mBitMap));*/
                 intent.putExtra("BitmapPath",mBitMapPath);
-                PostCofCameraActivity.this.setResult(0,intent);
+                PostCofCameraActivity.this.setResult(StaticConstant.GETBITMAP_FROM_CAMERA,intent);
                 PostCofCameraActivity.this.finish();
             }
         });
@@ -252,7 +252,6 @@ public class PostCofCameraActivity extends Activity{
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null && iv_show != null && iv_show.getVisibility() == View.GONE) {
                 changeShowingViews();
-                savePic(bitmap);
                 iv_show.setImageBitmap(bitmap);
             }
         }

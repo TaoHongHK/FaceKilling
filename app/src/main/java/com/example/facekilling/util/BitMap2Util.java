@@ -4,6 +4,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.example.facekilling.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
@@ -17,10 +19,8 @@ public class BitMap2Util {
             }else return null;
     }
 
-    public static Bitmap idToBitMap(Resources res, int id){
-        InputStream is = res.openRawResource(id);
-        Bitmap bitmap = BitmapFactory.decodeStream(is);
-        return bitmap;
+    public static Bitmap Drawable2BitMap(Resources res, int id){
+       return BitmapFactory.decodeResource(res, id);
     }
 
 

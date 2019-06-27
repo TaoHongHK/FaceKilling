@@ -144,7 +144,7 @@ public class IndexActivity extends AppCompatActivity {
         //监控侧边栏头像
         View navHeaderView = navigationView.getHeaderView(0);
         CircleImageView cirIViewHead = (CircleImageView) navHeaderView.findViewById(R.id.avatar_img);
-        cirIViewHead.setImageResource(MainUser.getInstance().getImageId());
+        cirIViewHead.setImageBitmap(MainUser.getInstance().getImageBitMap());
         TextView mail = (TextView) navHeaderView.findViewById(R.id.mail);
         mail.setText(MainUser.getInstance().getEmail());
         TextView user_name = (TextView) navHeaderView.findViewById(R.id.username);

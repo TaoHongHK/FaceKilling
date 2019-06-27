@@ -123,18 +123,13 @@ public class YanZhiCameraActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (iv_show.getVisibility()==View.VISIBLE && imgString!=null){
-                    new Thread(new Runnable() {
+                    Log.d("yanzhiUpload", "onClick: nowIn");
+                    //scroeString = OkHttpUtils.YanZhiPost(imgString);
+                    Log.d("yanzhiUpload", "onClick: "+scroeString);
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d("yanzhiUpload", "onClick: nowIn");
-                            scroeString = OkHttpUtils.YanZhiPost(imgString);
-                            Log.d("yanzhiUpload", "onClick: "+scroeString);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    scoreTextView.setText(scroeString);
-                                }
-                            });
+                            scoreTextView.setText(scroeString);
                         }
                     });
                 }
