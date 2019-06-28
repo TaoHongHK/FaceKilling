@@ -61,6 +61,7 @@ public class FaceKCamera extends AppCompatActivity {
     private Button takePicButt;
     private Button flipCamera;
     private boolean isCameraing;
+    private ImageView iv_show;
     private Button reTakeButt;
     private Button chosenButt;
     private String mBitMapPath;
@@ -82,6 +83,7 @@ public class FaceKCamera extends AppCompatActivity {
         flipCamera = (Button) findViewById(R.id.camera_flip_camera);
         reTakeButt = (Button) findViewById(R.id.camera_reTakeButt);
         chosenButt = (Button) findViewById(R.id.camera_chosenButt);
+        iv_show = (ImageView) findViewById(R.id.camera_iv_show_camera);
         initCameraInfo();
         GetBitmap.askForStorePermission(getActivity(),getApplicationContext());
         mSurfaceView = (SurfaceView) findViewById(R.id.camera_surface_view_camera);
@@ -337,12 +339,14 @@ public class FaceKCamera extends AppCompatActivity {
             takePicButt.setVisibility(View.GONE);
             reTakeButt.setVisibility(View.VISIBLE);
             chosenButt.setVisibility(View.VISIBLE);
+            iv_show.setVisibility(View.VISIBLE);
         }else{
             mSurfaceView.setVisibility(View.VISIBLE);
             flipCamera.setVisibility(View.VISIBLE);
             takePicButt.setVisibility(View.VISIBLE);
             reTakeButt.setVisibility(View.GONE);
             chosenButt.setVisibility(View.GONE);
+            iv_show.setVisibility(View.GONE);
         }
         isCameraing = !isCameraing;
     }
@@ -367,6 +371,7 @@ public class FaceKCamera extends AppCompatActivity {
                 if (bitmapPath!=null){
                     faceKCamera.setBitmapPath(bitmapPath);
                     changeShowingViews();
+                    iv_show.setImageBitmap(GetBitmap.getBitmapFromSD(bitmapPath));
                 }
             }
         }

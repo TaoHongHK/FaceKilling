@@ -9,8 +9,7 @@ public class StaticConstant {
     public static final String FUNCTIONBUTT_REQUEST = "FunctionButtRequest";
     public static final String BITMAP_PATH = "BitmapPath";
     public static final String FRONT_IP = "http://";
-    public static final String IP = "10.14.170.88";
-//public static final String IP = "10.13.7.78";
+    public static final String IP = "10.14.172.138";
     public static final String PORT = "8000";
     public static final String GET_TEST = FRONT_IP + IP + ":"+PORT+"/test_get/";
     public static final String POST_TEST = FRONT_IP + IP + ":"+PORT+"/test_post/";

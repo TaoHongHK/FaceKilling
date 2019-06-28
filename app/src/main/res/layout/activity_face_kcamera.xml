@@ -7,6 +7,15 @@
         android:layout_width="500dp"
         android:layout_height="match_parent" />
 
+    <ImageView
+        android:id="@+id/camera_iv_show_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop" />
+
+
     <Button
         android:id="@+id/camera_take_pic_butt"
         android:layout_width="@dimen/camera_butt_size"
