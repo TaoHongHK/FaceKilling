@@ -46,12 +46,14 @@ public class MyCofActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_cof);
 
         //接受数据
-        Intent intent = getIntent();
-        List<Cof> listFromIndexThree = (List<Cof>) intent.getSerializableExtra("cofList");
-        if(listFromIndexThree.size() != 0){
-            myCofList.addAll(listFromIndexThree);
-        }
+        initCofList();
         initView();
+        //各种监控事件
+        monitor();
+    }
+
+    public void initCofList(){
+        //TODO:从服务器段获取登陆用户自己的cof
     }
 
     public void initView(){
@@ -59,19 +61,9 @@ public class MyCofActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
 
 
-
         //背景
         ImageView imageview = findViewById(R.id.myCof_background);
-        imageview.setImageResource(MainUser.getInstance().getImageId());
-        //卡片式显示朋友圈
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.myCof_recycler_view);
-        GridLayoutManager layoutManger = new GridLayoutManager(MyCofActivity.this,1);
-        layoutManger.setAutoMeasureEnabled(true);
-        recyclerView.setLayoutManager(layoutManger);
-        cofadapter = new CofAdapter(MyCofActivity.this,myCofList);
-        recyclerView.setAdapter(cofadapter);
-
+        /*imageview.setImageBitmap(MainUser.getInstance().getImageBitMap());*/
         //下拉刷新
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.myCof_swipe_refresh);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -81,9 +73,14 @@ public class MyCofActivity extends AppCompatActivity {
             }
         });
 
-        //各种监控事件
-        monitor();
-
+        if(myCofList.size() == 0) return;
+        //卡片式显示朋友圈
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.myCof_recycler_view);
+        GridLayoutManager layoutManger = new GridLayoutManager(MyCofActivity.this,1);
+        layoutManger.setAutoMeasureEnabled(true);
+        recyclerView.setLayoutManager(layoutManger);
+        cofadapter = new CofAdapter(MyCofActivity.this,myCofList);
+        recyclerView.setAdapter(cofadapter);
 
     }
 

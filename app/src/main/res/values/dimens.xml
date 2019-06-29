@@ -10,4 +10,5 @@
     <dimen name="topbar_butt_width">30dp</dimen>
     <dimen name="topbar_butt_height">30dp</dimen>
     <dimen name="friend_item_height">80dp</dimen>
+    <dimen name="face_item_img_size">40dp</dimen>
 </resources>

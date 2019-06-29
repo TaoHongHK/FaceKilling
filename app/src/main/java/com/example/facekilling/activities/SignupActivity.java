@@ -1,8 +1,6 @@
 package com.example.facekilling.activities;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -92,7 +90,7 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public void run() {
                 signUpHandle.obtainMessage(SIGN_WHAT,
-                        OkHttpUtils.SignUp( name,email,password,mobile,gender,address,
+                        OkHttpUtils.signUp( name,email,password,mobile,gender,address,
                                 GetBitmap.getDefaultHead(getApplicationContext(),gender))).sendToTarget();
             }
         }).start();

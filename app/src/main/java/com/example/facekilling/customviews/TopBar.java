@@ -135,6 +135,7 @@ public class TopBar extends LinearLayout {
                 clickListener.leftClicked();
             }
         });
+        leftTv.setTextAlignment(TEXT_ALIGNMENT_CENTER);
 
         leftButt.setWidth(DensityUtil.dp2dx(getContext(),leftButtWidth));
         leftButt.setHeight(DensityUtil.dp2dx(getContext(),leftButtHeight));
@@ -167,6 +168,7 @@ public class TopBar extends LinearLayout {
                     clickListener.rightClicked();
             }
         });
+        rightTv.setTextAlignment(TEXT_ALIGNMENT_CENTER);
 
 
         rightButt.setWidth(DensityUtil.dp2dx(getContext(),rightButtWidth));

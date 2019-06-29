@@ -1,11 +1,9 @@
 package com.example.facekilling.activities;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -21,14 +19,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
-import com.example.facekilling.javabean.MainUser;
-import com.example.facekilling.util.GetSysTime;
 import com.example.facekilling.util.OkHttpUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
@@ -109,8 +104,8 @@ public class LoginActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int result = OkHttpUtils.LogIn(email,password);
-                OkHttpUtils.GetMainUserInfo(result);
+                int result = OkHttpUtils.logIn(email,password);
+                OkHttpUtils.getMainUserInfo(result);
                 logInHandle.obtainMessage(LOGIN_WHAT,result).sendToTarget();
             }
         }).start();
@@ -132,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                 }else if (loginResult == -1){
                     loginActivity.onLoginFailed("password wrong!");
                 }else if (loginResult == -2){
-                    loginActivity.onLoginFailed("email wrong!");
+                    loginActivity.onLoginFailed("email not found!");
                 }else loginActivity.onLoginFailed();
             }
 

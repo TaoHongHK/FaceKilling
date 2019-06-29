@@ -49,6 +49,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.example.facekilling.util.GetBitmap.deleteFilePackage;
+import static com.example.facekilling.util.GetBitmap.getAllPicFromUser;
+import static com.example.facekilling.util.GetBitmap.getBitmapFromSD;
+import static com.example.facekilling.util.StaticConstant.TACK_DEFAULT;
+import static com.example.facekilling.util.StaticConstant.TACK_PICTURE_TO_COF;
+import static com.example.facekilling.util.StaticConstant.TMP_IMG_FILE;
+
 public class CofActivity extends AppCompatActivity {
 
 
@@ -66,24 +73,8 @@ public class CofActivity extends AppCompatActivity {
 
 
     private List<Picture> picturesList = new ArrayList<>();
-    PictureAdapater adapter;
+    PictureAdapater adapter = new PictureAdapater(picturesList);
 
-    private Picture[] pictures = {
-            new Picture(R.drawable.picture_01),
-            new Picture(R.drawable.picture_02),
-            new Picture(R.drawable.picture_03),
-            new Picture(R.drawable.picture_04),
-            new Picture(R.drawable.picture_05),
-            new Picture(R.drawable.picture_06),
-            new Picture(R.drawable.picture_07),
-            new Picture(R.drawable.picture_08),
-            new Picture(R.drawable.picture_09),
-            new Picture(R.drawable.picture_10),
-            new Picture(R.drawable.picture_11),
-            new Picture(R.drawable.picture_12),
-            new Picture(R.drawable.picture_13),
-            new Picture(R.drawable.picture_14),
-    };
 
     private Context getContent(){
         return mContext;
@@ -95,13 +86,8 @@ public class CofActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cof);
         mContext = getApplicationContext();
 
-        picturesList.clear();
-        Intent intent = getIntent();
-        List<Picture> mPictureList=  (List<Picture>)intent.getSerializableExtra("PictureList");
-        if(mPictureList != null){
-            picturesList.addAll(mPictureList);
-        }
 
+        initPictures();
         initView();
         //各种监控事件
         monitor();
@@ -113,27 +99,27 @@ public class CofActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
 
         head_img = (ImageView) findViewById(R.id.cof_activity_head_img);
-        if(MainUser.getInstance().getImageId() == -1){
-            head_img.setImageResource(MainUser.getInstance().getImageId());
-        }
-        else{
-            head_img.setImageBitmap(MainUser.getInstance().getImageBitMap());
-        }
-        head_img.setImageResource(MainUser.getInstance().getImageId());
+        head_img.setImageBitmap(MainUser.getInstance().getImageBitMap());
+
         head_name = (TextView) findViewById(R.id.cof_activity_head_name);
         head_name.setText(MainUser.getInstance().getUser_name());
         head_photo = (ImageView) findViewById(R.id.cof_activity_head_photo);
         head_photo.setImageResource(R.drawable.cof_photo);
         editText = (EditText) findViewById(R.id.cof_activity_head_content);
 
-        initPictures();
+
         recyclerView = (RecyclerView) findViewById(R.id.cof_activity_imgs);
         StaggeredGridLayoutManager layoutManager = new
                 StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
 
-        //设置高度自适应
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new PictureAdapater(picturesList);
+
+        setAdaptiveHeight();
+
+        recyclerView.setAdapter(adapter);
+    }
+    //设置高度自适应
+    private void setAdaptiveHeight(){
         int num = adapter.getItemCount();
         int height;
         if (num==0){
@@ -149,8 +135,9 @@ public class CofActivity extends AppCompatActivity {
         ViewGroup.LayoutParams lp=linearLayout.getLayoutParams();
         lp.height=height;
         linearLayout.setLayoutParams(lp);
-        recyclerView.setAdapter(adapter);
     }
+
+
     private void monitor(){
         topBar = (TopBar) findViewById(R.id.cofActivityTopBar);
         ImageView head_photo = (ImageView) findViewById(R.id.cof_activity_head_photo);
@@ -164,6 +151,7 @@ public class CofActivity extends AppCompatActivity {
                 Cof cof = null;
                 intent.putExtra("cof",cof);
                 setResult(StaticConstant.GETCOF_FROM_NEW,intent);
+                deleteFilePackage(TMP_IMG_FILE);
                 finish();
             }
 
@@ -172,12 +160,10 @@ public class CofActivity extends AppCompatActivity {
             public void rightClicked() {
                 String content = editText.getText().toString().trim();
                 if(!content.equals("") || picturesList.size() != 0){
-                    Cof cof = new Cof(MainUser.getInstance(),content,picturesList);
+                    //TODO:写一个将这个新建的cof提交给服务器的函数
+                    Cof cof = new Cof(MainUser.getInstance().getUser_id(),content,picturesList);
                     Intent intent = new Intent(CofActivity.this, IndexActivity.class);
                     intent.putExtra("id",3);
-                    intent.putExtra("cof",cof);
-                    setResult(StaticConstant.GETCOF_FROM_NEW,intent);
-                    intent.setFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 }
                 else{
@@ -230,35 +216,38 @@ public class CofActivity extends AppCompatActivity {
 
 
     private void initPictures(){
-        for(int i=0;i<0;i++){
-            Random random = new Random();
-            int index = random.nextInt(pictures.length);
-            picturesList.add(pictures[index]);
+        picturesList.clear();
+        Intent intent = getIntent();
+        int tackid = intent.getIntExtra("tack",TACK_DEFAULT);
+        List<String> picPathList = (List<String>) intent.getStringArrayListExtra("picPathList");
+        if(tackid == TACK_PICTURE_TO_COF){
+            for(int i=0;i<picPathList.size();i++){
+                Bitmap bitmap = getBitmapFromSD(picPathList.get(i));
+                picturesList.add(new Picture(bitmap,picPathList.get(i)));
+            }
         }
     }
 
+    //响应添加图片按钮
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         switch (requestCode){
             case StaticConstant.GETBITMAP_FROM_CAMERA:
-                /*byte[] bitmapByteArray = data.getByteArrayExtra("imgBitmap");
-                if (bitmapByteArray!=null) {
-                    picturesList.add(new Picture(
-                            BitmapFactory.decodeByteArray(bitmapByteArray, 0, bitmapByteArray.length)));
-                    adapter.notifyDataSetChanged();
-                }*/
                 String bitmapPath = data.getStringExtra(StaticConstant.BITMAP_PATH);
                 if (bitmapPath!=null){
-                    picturesList.add(new Picture(GetBitmap.getBitmapFromSD(bitmapPath)));
+                    picturesList.add(new Picture(getBitmapFromSD(bitmapPath)));
                 }
-                initView();
+                setAdaptiveHeight();
+                adapter.notifyDataSetChanged();
                 break;
             case StaticConstant.GETBITMAP_FROM_APP:
-                List<Picture> mPictureList=  (List<Picture>)data.getSerializableExtra("LookForPictureList");
-                if(mPictureList != null){
-                    adapter.addAllPicture(mPictureList);
+                List<String> picPathList = data.getStringArrayListExtra("picPathList");
+                for(int i=0;i<picPathList.size();i++){
+                    Bitmap bitmap = getBitmapFromSD(picPathList.get(i));
+                    picturesList.add(new Picture(bitmap,picPathList.get(i)));
                 }
-                initView();
+                setAdaptiveHeight();
+                adapter.notifyDataSetChanged();
                 break;
             case StaticConstant.GETBITMAP_FROM_SD:
                 if (resultCode==RESULT_OK && data!=null) {
@@ -268,9 +257,10 @@ public class CofActivity extends AppCompatActivity {
                     c.moveToFirst();
                     int columnIndex = c.getColumnIndex(filePathColumns[0]);
                     String imagePath = c.getString(columnIndex);
-                    picturesList.add(new Picture(GetBitmap.getBitmapFromSD(imagePath)));
+                    picturesList.add(new Picture(getBitmapFromSD(imagePath)));
                     c.close();
-                    initView();
+                    setAdaptiveHeight();
+                    adapter.notifyDataSetChanged();
                 }
                 break;
 

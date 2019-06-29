@@ -14,23 +14,47 @@ import com.example.facekilling.javabean.Friend;
 import java.util.List;
 
 public class FriendAdapter extends ArrayAdapter<Friend> {
-    private int resourceId;
 
-    public FriendAdapter(Context context, int resource, List<Friend> objects) {
-        super(context, resource, objects);
-        resourceId = resource;
+    private Context context;
+
+    public FriendAdapter(Context context,List<Friend> objects) {
+        super(context, R.layout.friend_item, objects);
+        this.context = context;
     }
 
     public View getView(int position, View convertView, ViewGroup parent){
-        Friend user = getItem(position);
+        Friend friend = getItem(position);
+
+        ViewHolder viewHolder;
+
         View view;
-        view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
-        ImageView touxiang = (ImageView) view.findViewById(R.id.touxiang_image);
-        TextView userName = (TextView) view.findViewById(R.id.user_name);
-        TextView message = (TextView) view.findViewById(R.id.user_message);
-        touxiang.setImageResource(user.getImageId());
-        userName.setText(user.getUser_name());
-        message.setText(user.getMessage());
-        return view;
+
+        if(convertView == null){
+            viewHolder = new ViewHolder();
+
+            convertView = LayoutInflater.from(context).inflate(R.layout.friend_item, parent, false);
+
+            viewHolder.avatar = (ImageView) convertView.findViewById(R.id.touxiang_image);
+            viewHolder.name = (TextView) convertView.findViewById(R.id.user_name);
+            viewHolder.message = (TextView) convertView.findViewById(R.id.user_message);
+
+            view = convertView;
+
+            convertView.setTag(viewHolder);
+        }else {
+            viewHolder = (ViewHolder) convertView.getTag();
+            view = convertView;
+        }
+
+        viewHolder.avatar.setImageBitmap(friend.getImageBitMap());
+        viewHolder.name.setText(friend.getUser_name());
+
+        return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView name;
+        TextView message;
+        ImageView avatar;
     }
 }

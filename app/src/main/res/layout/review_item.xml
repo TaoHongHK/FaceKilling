@@ -5,19 +5,18 @@
     android:background="@android:color/white"
     android:paddingTop="5dp">
 
-
-    <ImageView
-        android:id="@+id/review_img"
-        android:layout_width="@dimen/cof_head_review_size"
-        android:layout_height="@dimen/cof_head_review_size"
-        android:scaleType="centerCrop"
-        android:layout_marginTop="10dp" />
+    <TextView
+        android:id="@+id/review_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#4CA2D8"
+        android:gravity="left"
+        android:textStyle="bold"/>
     <TextView
         android:id="@+id/review_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_marginTop="13dp"
         android:layout_marginStart="9dp"
         android:textSize="15sp" />
 

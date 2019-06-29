@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.example.facekilling.javabean.MainUser;
+import com.example.facekilling.javabean.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +21,7 @@ import java.util.List;
 public class JsonUtil {
 
 
-    public static MainUser decodeMainUserFronJson(String JsonInfo) throws Exception{
+    public static MainUser decodeMainUserFronJson(String JsonInfo,int id) throws Exception{
         int error = -1;
         MainUser mainUser = null;
 
@@ -34,9 +35,29 @@ public class JsonUtil {
                         JsonUtil.decodeImgFromImgString(json.getString("head")),
                                 json.getString("gender"),json.getString("phone"),json.getString("address"));
                 mainUser.setFriendIdList(JsonUtil.getFrindsList(json));
+                mainUser.setUser_id(id);
             }
         }
         return mainUser;
+    }
+
+    public static User decodeUserFronJson(String JsonInfo, int id) throws Exception{
+        int error = -1;
+        User user = null;
+
+        if (!"".equals(JsonInfo) && JsonInfo != null) {
+            JSONObject json = new JSONObject(JsonInfo);
+            error = json.getInt("error");
+            Log.d("Mlogin", "register error: "+json.getInt("error"));
+            if (error == 0) {
+                //String email, String user_name, Bitmap imageBitMap, String gender, String phone, String address
+                user = new User(json.getString("email"),json.getString("nickname"),
+                        JsonUtil.decodeImgFromImgString(json.getString("head")),
+                        json.getString("gender"),json.getString("phone"),json.getString("address"));
+                user.setUser_id(id);
+            }
+        }
+        return user;
     }
 
     public static List<Integer> getFrindsList(JSONObject jsonObject){
@@ -102,7 +123,7 @@ public class JsonUtil {
         return result;
     }
 
-    public static int decodeErrorFronJson(String JsonInfo)throws Exception{
+    public static int decodeErrorFronJson(String JsonInfo)throws JSONException{
         int error = -1;
         if (!"".equals(JsonInfo) && JsonInfo != null) {
             JSONObject json = new JSONObject(JsonInfo);

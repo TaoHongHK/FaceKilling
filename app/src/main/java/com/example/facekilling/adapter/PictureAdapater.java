@@ -87,12 +87,7 @@ public class PictureAdapater extends RecyclerView.Adapter<PictureAdapater.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Picture picture = mPictureList.get(position);
-        if(picture.getImageId() == -1){
-            holder.pictureImage.setImageBitmap(picture.getImageBitMap());
-        }
-        else{
-            Glide.with(mContext).load(picture.getImageId()).into(holder.pictureImage);
-        }
+        holder.pictureImage.setImageBitmap(picture.getImageBitMap());
 
 
         //长按事件

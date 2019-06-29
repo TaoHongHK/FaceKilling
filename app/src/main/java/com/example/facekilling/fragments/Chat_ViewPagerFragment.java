@@ -1,7 +1,5 @@
 package com.example.facekilling.fragments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -11,21 +9,21 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
-import com.example.facekilling.activities.CofActivity;
 import com.example.facekilling.adapter.ChatMessageAdapter;
 import com.example.facekilling.javabean.ChatMessage;
-import com.example.facekilling.util.ConnectToServer;
+import com.example.facekilling.javabean.Friend;
+import com.example.facekilling.javabean.MainUser;
+import com.example.facekilling.util.OkHttpUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,16 +33,16 @@ public class Chat_ViewPagerFragment extends Fragment {
     private EditText text;
     private Button bt;
     private RecyclerView recy;
-    public List list;
-    private ConnectToServer lj;
+    public List<ChatMessage> list;
     private TextView friName;
     private String friNameString;
-    public Handler hand = new MyHandle(this);
+    private int friendId;
 
 
-    public static Chat_ViewPagerFragment newInstance(String friName){
+    public static Chat_ViewPagerFragment newInstance(String friName,int id){
         Bundle bundle = new Bundle();
         bundle.putString("FriendName",friName);
+        bundle.putInt("FriendId",id);
         Chat_ViewPagerFragment chat_viewPagerFragment = new Chat_ViewPagerFragment();
         chat_viewPagerFragment.setArguments(bundle);
         Log.d("chatviewpager", "newInstance: "+friName);
@@ -57,7 +55,7 @@ public class Chat_ViewPagerFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle!=null){
             friNameString = bundle.getString("FriendName");
-            Log.d("chatviewpager", "onCreate: "+friNameString);
+            friendId = bundle.getInt("FriendId");
         }
     }
 
@@ -84,47 +82,31 @@ public class Chat_ViewPagerFragment extends Fragment {
         list = new ArrayList();
         LinearLayoutManager lin = new LinearLayoutManager(getContext());
         recy.setLayoutManager(lin);
-        lj = new ConnectToServer(this);
-        bt.setOnClickListener(new View.OnClickListener() {//给发送按钮设置监听事件
+        recy.setAdapter(new ChatMessageAdapter(list));
+        bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String s = text.getText().toString();
-                if (s == null || s.equals("")) {
-                    Toast.makeText(getContext(), "发送消息不能为空", Toast.LENGTH_SHORT).show();
-                } else {
-                    list.add(new ChatMessage(s, R.drawable.sz, false));
-                    //new一个xx类，第一个参数的信息的内容，第二个参数是头像的图片id，第三个参数表示左右
-                    //true为左边，false为右
-                    lj.fa(s);//发送消息
-                    recy.setAdapter(new ChatMessageAdapter(list));//再把list添加到适配器
-                    text.setText(null);
-                    recy.scrollToPosition(list.size() - 1);//将屏幕移动到RecyclerView的底部
-                }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String s = text.getText().toString();
+                        try {
+                            OkHttpUtils.postSendInfoToFriend(MainUser.getInstance().getUser_id(),friendId,s);
+                        }catch (IOException ie){
+                            ie.printStackTrace();
+                        }
+                        list.add(new ChatMessage(s, MainUser.getInstance().getImageBitMap(), false));
+                        //new一个xx类，第一个参数的信息的内容，第二个参数是头像的图片id，第三个参数表示左右
+                        //true为左边，false为右
+                        ChatMessageAdapter chatMessageAdapter = (ChatMessageAdapter) recy.getAdapter();
+                        if (chatMessageAdapter != null) {
+                            chatMessageAdapter.notifyDataSetChanged();
+                        }
+                        text.setText("");
+                        recy.scrollToPosition(list.size() - 1);//将屏幕移动到RecyclerView的底部
+                    }
+                }).start();
             }
         });
-    }
-
-
-
-    class MyHandle extends Handler{
-        private Chat_ViewPagerFragment chat_viewPagerFragment;
-
-        public MyHandle(Chat_ViewPagerFragment chat_viewPagerFragment){
-            this.chat_viewPagerFragment = chat_viewPagerFragment;
-        }
-
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 1:
-                    Toast.makeText(getContext(), "连接服务器成功", Toast.LENGTH_SHORT).show();
-                    break;
-                case 2:
-                    recy.setAdapter(new ChatMessageAdapter(list));//设置适配器
-                    recy.scrollToPosition(list.size() - 1);//将屏幕移动到RecyclerView的底部
-                    break;
-            }
-        }
     }
 }

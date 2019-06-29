@@ -1,10 +1,12 @@
 package com.example.facekilling.javabean;
 
+import android.graphics.Bitmap;
+
 public class Friend extends User{
     private String message;
-    public Friend(String user_name, int imageId, String message){
-        super(user_name,imageId);
-        this.message = message;
+
+    public Friend(String email,String user_name,Bitmap bitmap, String gender,String phone,String address){
+        super(email,user_name,bitmap,gender,phone,address);
     }
 
     public String getMessage(){

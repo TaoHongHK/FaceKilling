@@ -135,9 +135,9 @@ public class Index_TwoFragment extends Fragment {
         });
         fri_viewPagerFragment.setItemClickListener(new Fri_ViewPagerFragment.ItemClickListener() {
             @Override
-            public void onItemClicked(String userName) {
+            public void onItemClicked(String userName,int id) {
                 fragments.remove(fragments.size()-1);
-                fragments.put(1,Chat_ViewPagerFragment.newInstance(userName));
+                fragments.put(1,Chat_ViewPagerFragment.newInstance(userName,id));
                 myStatePageAdapter.notifyDataSetChanged();
                 swichViewPage(1);
             }

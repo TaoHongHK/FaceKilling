@@ -17,19 +17,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:src="@drawable/search"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
         <EditText
+            android:id="@+id/activity_add_friend_editText"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:hint="@string/searchHint"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"/>
+        <Button
+            android:id="@+id/activity_add_friend_addButt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="4dp"
+            android:layout_marginHorizontal="4dp"
+            android:background="@drawable/shape_post"
+            android:text="添加"/>
     </LinearLayout>
 
 </LinearLayout>

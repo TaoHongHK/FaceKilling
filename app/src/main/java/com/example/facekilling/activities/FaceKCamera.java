@@ -1,11 +1,10 @@
 package com.example.facekilling.activities;
 
-import android.Manifest;
+
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -16,10 +15,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
@@ -27,10 +25,10 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
+import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.util.GetBitmap;
 import com.example.facekilling.util.GetSysTime;
 import com.example.facekilling.util.StaticConstant;
@@ -42,6 +40,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import static com.oguzdev.circularfloatingactionmenu.library.SubActionButton.THEME_DARKER;
 
@@ -62,6 +61,7 @@ public class FaceKCamera extends AppCompatActivity {
     private Button flipCamera;
     private boolean isCameraing;
     private ImageView iv_show;
+    private CardView cardView;
     private Button reTakeButt;
     private Button chosenButt;
     private String mBitMapPath;
@@ -84,6 +84,7 @@ public class FaceKCamera extends AppCompatActivity {
         reTakeButt = (Button) findViewById(R.id.camera_reTakeButt);
         chosenButt = (Button) findViewById(R.id.camera_chosenButt);
         iv_show = (ImageView) findViewById(R.id.camera_iv_show_camera);
+        cardView = (CardView) findViewById(R.id.camera_iv_cardview);
         initCameraInfo();
         GetBitmap.askForStorePermission(getActivity(),getApplicationContext());
         mSurfaceView = (SurfaceView) findViewById(R.id.camera_surface_view_camera);
@@ -170,8 +171,23 @@ public class FaceKCamera extends AppCompatActivity {
         }
     }
 
+    public void parameters(Camera camera) {
+        List<Camera.Size> pictureSizes = camera.getParameters().getSupportedPictureSizes();
+        List<Camera.Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
+        Camera.Size psize;
+        for (int i = 0; i < pictureSizes.size(); i++) {
+            psize = pictureSizes.get(i);
+            Log.i("pictureSize",psize.width+" x "+psize.height);
+        }
+        for (int i = 0; i < previewSizes.size(); i++) {
+            psize = previewSizes.get(i);
+            Log.i("previewSize",psize.width+" x "+psize.height);
+        }
+    }
+
     private void initFrontCamera() {
         mCamera = Camera.open(frontCameraId);//默认开启后置
+        parameters(mCamera);
         mCamera.setDisplayOrientation(90);//摄像头进行旋转90°
         if (mCamera != null) {
             try {
@@ -183,7 +199,7 @@ public class FaceKCamera extends AppCompatActivity {
                 //设置图片格式
                 parameters.setPictureFormat(ImageFormat.JPEG);
                 //设置图片的质量
-                parameters.set("jpeg-quality", 90);
+                parameters.set("jpeg-quality", 20);
                 //设置照片的大小
                 parameters.setPictureSize(viewWidth, viewHeight);
                 //通过SurfaceView显示预览
@@ -243,21 +259,12 @@ public class FaceKCamera extends AppCompatActivity {
     }
 
     public void takePicture(){
+        Log.d("timeTest", "run: 开始拍照"+GetSysTime.getCurrTime());
         if (mCamera==null){
             return;
         }
         else {
-            mCamera.takePicture(new Camera.ShutterCallback() {//按下快门
-                @Override
-                public void onShutter() {
-                    //按下快门瞬间的操作
-                }
-            }, new Camera.PictureCallback() {
-                @Override
-                public void onPictureTaken(byte[] data, Camera camera) {//是否保存原始图片的信息
-
-                }
-            }, pictureCallback);
+            mCamera.takePicture(null,null, pictureCallback);
         }
     }
 
@@ -266,12 +273,16 @@ public class FaceKCamera extends AppCompatActivity {
         public void onPictureTaken(byte[] data, Camera camera) {
             final Bitmap resource = BitmapFactory.decodeByteArray(data, 0, data.length);
             if (resource == null) {
-                Toast.makeText(getApplicationContext(), "拍照失败", Toast.LENGTH_SHORT).show();
+                Toast toast = Toast.makeText(getApplicationContext(),"拍照失败",Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.TOP,0,0);
+                toast.show();
             }
             final Matrix matrix = new Matrix();
             matrix.setRotate(-90);
-            final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
+            final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0,
+                    resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null) {
+                Log.d("timeTest", "run: 开始保存图片"+GetSysTime.getCurrTime());
                 savePic(bitmap);
             }
         }
@@ -286,21 +297,22 @@ public class FaceKCamera extends AppCompatActivity {
                     return;
                 }
                 FileOutputStream fileOutputStream = null;
-                String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+"Camera";
+                String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() +
+                        File.separator + "FaceK"+File.separator+ MainUser.getInstance().getUser_id();
                 File baseFile = new File(baseFilePath);
                 if (!baseFile.exists()) {
                     baseFile.mkdirs();
                 }
                 String pickName = GetSysTime.getCurrTime() +".jpg";
-                Log.d("cameraMMMMM",pickName);
                 try {
                     File picFile = new File(baseFile,pickName);
                     fileOutputStream = new FileOutputStream(picFile);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
                     MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
                     Uri uri = Uri.fromFile(picFile);
                     sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
                     savePicCallBackHandle.obtainMessage(CAMERA_WHAT,picFile.getAbsolutePath()).sendToTarget();
+                    Log.d("timeTest", "run: 已保存图片 "+GetSysTime.getCurrTime());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } finally {
@@ -333,20 +345,20 @@ public class FaceKCamera extends AppCompatActivity {
 
     public void changeShowingViews(){
         if (isCameraing){
-            mCamera.stopPreview();
+            stopCamera();
             mSurfaceView.setVisibility(View.GONE);
             flipCamera.setVisibility(View.GONE);
             takePicButt.setVisibility(View.GONE);
             reTakeButt.setVisibility(View.VISIBLE);
             chosenButt.setVisibility(View.VISIBLE);
-            iv_show.setVisibility(View.VISIBLE);
+            cardView.setVisibility(View.VISIBLE);
         }else{
             mSurfaceView.setVisibility(View.VISIBLE);
             flipCamera.setVisibility(View.VISIBLE);
             takePicButt.setVisibility(View.VISIBLE);
             reTakeButt.setVisibility(View.GONE);
             chosenButt.setVisibility(View.GONE);
-            iv_show.setVisibility(View.GONE);
+            cardView.setVisibility(View.GONE);
         }
         isCameraing = !isCameraing;
     }
@@ -370,8 +382,11 @@ public class FaceKCamera extends AppCompatActivity {
                 Log.i("Mlogin",bitmapPath);
                 if (bitmapPath!=null){
                     faceKCamera.setBitmapPath(bitmapPath);
+                    Log.d("timeTest", "run: 开始改变界面"+GetSysTime.getCurrTime());
                     changeShowingViews();
+                    Log.d("timeTest", "run: 界面变化完毕 "+GetSysTime.getCurrTime());
                     iv_show.setImageBitmap(GetBitmap.getBitmapFromSD(bitmapPath));
+                    Log.d("timeTest", "run: 设置图片 "+GetSysTime.getCurrTime());
                 }
             }
         }
@@ -382,7 +397,8 @@ public class FaceKCamera extends AppCompatActivity {
         final ImageView fabIconNew = new ImageView(this);
         // 设置菜单按钮Button的图标
         fabIconNew.setImageResource(R.drawable.settings_menu);
-        final FloatingActionButton rightLowerButton = new FloatingActionButton.Builder(FaceKCamera.this).setContentView(fabIconNew).build();
+        final FloatingActionButton rightLowerButton = new FloatingActionButton
+                .Builder(FaceKCamera.this).setContentView(fabIconNew).build();
         //设置悬浮按钮的参数
         SubActionButton.Builder rLSubBuilder = new SubActionButton.Builder(this);
         rLSubBuilder.setTheme(THEME_DARKER);

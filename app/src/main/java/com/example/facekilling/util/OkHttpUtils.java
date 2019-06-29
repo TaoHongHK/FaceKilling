@@ -1,7 +1,6 @@
 package com.example.facekilling.util;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.example.facekilling.javabean.Expression;
@@ -42,10 +41,11 @@ public class OkHttpUtils {
     private static OkHttpClient client = new OkHttpClient();
 
     /**
-     * result: (>0)->success (=-1)->pwd wrong (=-2)->email wrong
      * @param email
-     * @param password*/
-    public static int LogIn(String email,String password) {
+     * @param password
+     * @return (>0)->success (=-1)->pwd wrong (=-2)->email wrong
+     * */
+    public static int logIn(String email, String password) {
         int result = -1;
         final Request request = new Request.Builder()
                 .url(StaticConstant.LOGIN+"?email="+email+"&password="+password)
@@ -74,7 +74,7 @@ public class OkHttpUtils {
     }
 
     /**
-     * result (>0)->success (=-1)->gender wrong (=-2)->email wrong
+     * @return result (>0)->success (=-1)->gender wrong (=-2)->email wrong
      * @param nickName
      * @param email
      * @param password
@@ -82,8 +82,8 @@ public class OkHttpUtils {
      * @param gender
      * @param address
      * @param path*/
-    public static int SignUp(String nickName,String email,String password,
-                             String mobile,String gender,String address,String path){
+    public static int signUp(String nickName, String email, String password,
+                             String mobile, String gender, String address, String path){
         int result = -1;
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -138,7 +138,7 @@ public class OkHttpUtils {
     /**
      * @param id
      */
-    public static MainUser GetMainUserInfo(int id){
+    public static MainUser getMainUserInfo(int id){
         MainUser mainUser = null;
         //发起请求
         final Request request = new Request.Builder()
@@ -147,7 +147,7 @@ public class OkHttpUtils {
         try {
             Response response = client.newCall(request).execute();
             if (response.isSuccessful()) {
-                mainUser = JsonUtil.decodeMainUserFronJson(response.body().string());
+                mainUser = JsonUtil.decodeMainUserFronJson(response.body().string(),id);
                 response.body().close();
             } else {
                 throw new IOException("Unexpected code:" + response);
@@ -161,10 +161,35 @@ public class OkHttpUtils {
     }
 
     /**
+     * @param id
+     */
+    public static User getUserInfo(int id){
+        User user = null;
+        //发起请求
+        final Request request = new Request.Builder()
+                .url(StaticConstant.GET_ACCOUNT_INFO+"?id="+ id)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                user = JsonUtil.decodeUserFronJson(response.body().string(),id);
+                response.body().close();
+            } else {
+                throw new IOException("Unexpected code:" + response);
+            }
+        } catch (IOException ie) {
+            ie.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+    /**
      * @param email
      * @param password
      */
-    public boolean DleteAccount(String email,String password){
+    public boolean dleteAccount(String email, String password){
         boolean result = false;
         FormBody.Builder builder = new FormBody.Builder()
                 .add("email",email)
@@ -191,7 +216,7 @@ public class OkHttpUtils {
      * @param phone
      * @param newPassword
      */
-    public boolean ForgetPassword(String email,String phone,String newPassword){
+    public boolean forgetPassword(String email, String phone, String newPassword){
         boolean result = false;
         FormBody.Builder builder = new FormBody.Builder()
                 .add("email",email)
@@ -226,9 +251,9 @@ public class OkHttpUtils {
      * @param newPhone
      * @param newAddress
      */
-    public boolean ChangeAccountInfo(int id,String email,String password,String newEmail,
-                                     String newPassword,String newNickname,String newHead,String newGender,
-                                     String newPhone,String newAddress){
+    public boolean changeAccountInfo(int id, String email, String password, String newEmail,
+                                     String newPassword, String newNickname, String newHead, String newGender,
+                                     String newPhone, String newAddress){
         boolean result = false;
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .addFormDataPart("id",String.valueOf(id))
@@ -330,7 +355,7 @@ public class OkHttpUtils {
      * @throws IOException
      * @throws JSONException
      */
-    public static void postAddFriend(User user, String email) throws IOException, JSONException {
+    public static int postAddFriend(User user, String email) throws IOException, JSONException {
         int friendId = getIdByEmail(email);
         RequestBody requestBody = new FormBody.Builder()
                 .add("id",Integer.toString(user.getUser_id()))
@@ -345,6 +370,13 @@ public class OkHttpUtils {
 
         String string = response.body().string();
         Log.d(TAG, "addFriend: "+string);
+        int error = -1;
+        try {
+            error = JsonUtil.decodeErrorFronJson(string);
+        }catch (JSONException je){
+            je.printStackTrace();
+        }
+        return error;
     }
 
     /**
@@ -373,16 +405,16 @@ public class OkHttpUtils {
 
     /**
      * 发送消息
-     * @param user
-     * @param friend
+     * @param mainUserId
+     * @param friendId
      * @param info
      * @throws IOException
      */
-    public static void postSendInfoToFriend(User user,User friend,String info) throws IOException {
+    public static void postSendInfoToFriend(int mainUserId,int friendId,String info) throws IOException {
         RequestBody formBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("id",Integer.toString(user.getUser_id()))
-                .addFormDataPart("id_friend",Integer.toString(friend.getUser_id()))
+                .addFormDataPart("id",Integer.toString(mainUserId))
+                .addFormDataPart("id_friend",Integer.toString(friendId))
                 .addFormDataPart("information",info)
                 .build();
         Request request = new Request.Builder()
@@ -399,19 +431,19 @@ public class OkHttpUtils {
 
     /**
      * 发送图片
-     * @param user
-     * @param friend
+     * @param mainUserId
+     * @param friendId
      * @param picture
      * @throws IOException
      */
-    public static void postSendImgToFriend(User user, User friend, Picture picture) throws IOException {
+    public static void postSendImgToFriend(int mainUserId, int friendId, Picture picture) throws IOException {
         String imagePath = picture.getImagePath();
         File file = new File(imagePath);
         RequestBody image = RequestBody.create(MediaType.parse("image/jpg"), file);
         RequestBody formBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("id",Integer.toString(user.getUser_id()))
-                .addFormDataPart("id_friend",Integer.toString(friend.getUser_id()))
+                .addFormDataPart("id",Integer.toString(mainUserId))
+                .addFormDataPart("id_friend",Integer.toString(friendId))
                 .addFormDataPart("image", imagePath, image)
                 .build();
         Request request = new Request.Builder()

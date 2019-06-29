@@ -2,6 +2,7 @@ package com.example.facekilling.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,15 +28,19 @@ import com.example.facekilling.javabean.Cof;
 import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.javabean.Picture;
 import com.example.facekilling.adapter.CofAdapter;
+import com.example.facekilling.javabean.Review;
 import com.example.facekilling.javabean.User;
 
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static android.content.Intent.getIntent;
+import static com.example.facekilling.util.GetBitmap.getBaseFilePath;
+import static com.example.facekilling.util.GetBitmap.getBitmapFromSD;
 
 public class Index_ThreeFragment extends Fragment {
 
@@ -46,48 +51,29 @@ public class Index_ThreeFragment extends Fragment {
 
     private List<Cof> myCofList = new ArrayList<>();
 
-    //测试
-    //显示信息
-    private List<Picture> images= new ArrayList<>();
-    private List<Picture> imagesList = new ArrayList<>();
 
-    private User[] users = {
-            new User("测试1",R.drawable.picture_01,MainUser.getInstance().getEmail()),
-            new User("测试2",R.drawable.picture_02,"12345478@163.com"),
-            new User("测试3",R.drawable.picture_03,"12345578@163.com"),
-            new User("测试4",R.drawable.picture_04,"12345778@163.com"),
-            new User("测试5",R.drawable.picture_05,"123451378@163.com"),
-    };
 
+//    private Cof[] cofs = {
+//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试1"),
+//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试2"),
+//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试3"),
+//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试4"),
+//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试5"),
+//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试6"),
+//    };
     private Cof[] cofs = {
-            new Cof(users[0],"这是一个测试1"),
-            new Cof(users[1],"这是一个测试2"),
-            new Cof(users[2],"这是一个测试3"),
-            new Cof(users[3],"这是一个测试4"),
-            new Cof(users[4],"这是一个测试5"),
-            new Cof(users[0],"这是一个测试6"),
-            new Cof(users[0],"这是一个测试7"),
+            new Cof(2,"这是一个测试1"),
+            new Cof(2,"这是一个测试2"),
+            new Cof(2,"这是一个测试3"),
+            new Cof(2,"这是一个测试4"),
+            new Cof(2,"这是一个测试5"),
+            new Cof(2,"这是一个测试6"),
     };
-    //用于测试显示图片
-    private Picture[] pictures = {
-            new Picture(R.drawable.picture_01),
-            new Picture(R.drawable.picture_02),
-            new Picture(R.drawable.picture_03),
-            new Picture(R.drawable.picture_04),
-            new Picture(R.drawable.picture_05),
-            new Picture(R.drawable.picture_06),
-            new Picture(R.drawable.picture_07),
-            new Picture(R.drawable.picture_08),
-            new Picture(R.drawable.picture_09),
-            new Picture(R.drawable.picture_10),
-            new Picture(R.drawable.picture_11),
-            new Picture(R.drawable.picture_12),
-            new Picture(R.drawable.picture_13),
-            new Picture(R.drawable.picture_14),
-    };
+
+
 
     private List<Cof> cofList = new ArrayList<>();
-    private CofAdapter cofadapter;
+    private CofAdapter cofadapter = new CofAdapter(getActivity(),cofList);
 
     //下拉刷新
     private SwipeRefreshLayout swipeRefresh;
@@ -104,8 +90,10 @@ public class Index_ThreeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_index_three,container,false);
+        initCofs();
         initView();
-
+        //各种监控事件
+        monitor();
         return mView;
     }
 
@@ -114,22 +102,9 @@ public class Index_ThreeFragment extends Fragment {
         drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawerlayout);
 
 
-
-
         ImageView imageview = mView.findViewById(R.id.cof_background);
         imageview.setImageResource(R.drawable.picture_01);
-        //卡片式显示朋友圈
-        initCofs();
-        onAttach(getActivity());
-        if(newCof != null){
-            cofList.add(0,newCof);
-        }
-        RecyclerView recyclerView = (RecyclerView) mView.findViewById(R.id.cof_recycler_view);
-        GridLayoutManager layoutManger = new GridLayoutManager(getActivity(),1);
-        layoutManger.setAutoMeasureEnabled(true);
-        recyclerView.setLayoutManager(layoutManger);
-        cofadapter = new CofAdapter(getActivity(),cofList);
-        recyclerView.setAdapter(cofadapter);
+
 
         //下拉刷新
         swipeRefresh = (SwipeRefreshLayout) mView.findViewById(R.id.cof_swipe_refresh);
@@ -141,8 +116,17 @@ public class Index_ThreeFragment extends Fragment {
         });
 
 
-        //各种监控事件
-        monitor();
+        if(cofList.size() == 0) return;
+        //卡片式显示朋友圈
+        onAttach(getActivity());
+        if(newCof != null){
+            cofList.add(0,newCof);
+        }
+        RecyclerView recyclerView = (RecyclerView) mView.findViewById(R.id.cof_recycler_view);
+        GridLayoutManager layoutManger = new GridLayoutManager(getActivity(),1);
+        layoutManger.setAutoMeasureEnabled(true);
+        recyclerView.setLayoutManager(layoutManger);
+        recyclerView.setAdapter(cofadapter);
 
 
     }
@@ -159,9 +143,6 @@ public class Index_ThreeFragment extends Fragment {
             //发表朋友圈
             public void rightClicked() {
                 Intent intent = new Intent(getActivity(), CofActivity.class);
-
-                List<Picture> mPictureList = new ArrayList<>();   //发送一个空的默认值
-                intent.putExtra("PictureList",(Serializable)mPictureList);
                 startActivity(intent);
             }
         });
@@ -169,14 +150,7 @@ public class Index_ThreeFragment extends Fragment {
         FloatingActionButton head_img = (FloatingActionButton) mView.findViewById(R.id.cof_head_img);
         head_img.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                myCofList.clear();
-                for(Cof cof:cofList){
-                    if(cof.getUser().equals(MainUser.getInstance())){
-                        myCofList.add(cof);
-                    }
-                }
                 Intent intent = new Intent(getActivity(),MyCofActivity.class);
-                intent.putExtra("cofList",(Serializable)myCofList);
                 startActivity(intent);
             }
         });
@@ -186,14 +160,23 @@ public class Index_ThreeFragment extends Fragment {
 
     }
     private void initCofs(){
-        images.add(new Picture(R.drawable.picture_01));
-        images.add(new Picture(R.drawable.picture_02));
-        images.add(new Picture(R.drawable.picture_03));
-        images.add(new Picture(R.drawable.picture_04));
+        //TODO:写一个从服务器端获取所有cof的函数
         cofList.clear();
+        //测试
+        Review review = new Review(MainUser.getInstance().getUser_id(),"评论测试");
+        List<Review> reviewList = new ArrayList<>();
+        reviewList.add(review);
+        String path = getBaseFilePath("5") + File.separator + "20190628021926.jpg";
+        Bitmap bitmap = getBitmapFromSD(path);
+        Picture picture = new Picture(bitmap,path);
+        List<Picture> pictureList = new ArrayList<>();
+        pictureList.add(picture);
+
         for(int i=0;i<10;i++){
             Random random = new Random();
             int index =  random.nextInt(cofs.length);
+            cofs[index].setImagesList(pictureList);
+            cofs[index].setReviewList(reviewList);
             cofList.add(cofs[index]);
         }
     }
@@ -208,6 +191,7 @@ public class Index_ThreeFragment extends Fragment {
                 }
                 getActivity().runOnUiThread(new Runnable(){
                     public void run(){
+                        initCofs();
                         cofadapter.notifyDataSetChanged();
                         swipeRefresh.setRefreshing(false);
                     }
@@ -219,14 +203,5 @@ public class Index_ThreeFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         newCof = ((IndexActivity) activity).getCof();
-    }
-
-    private void initPictures(){
-        imagesList.clear();
-        for(int i=0;i<4;i++){
-            Random random = new Random();
-            int index = random.nextInt(pictures.length);
-            imagesList.add(pictures[index]);
-        }
     }
 }

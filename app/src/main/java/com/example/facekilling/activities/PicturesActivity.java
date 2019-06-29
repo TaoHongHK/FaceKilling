@@ -5,6 +5,7 @@ import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 import com.example.facekilling.R;
 import com.example.facekilling.customviews.TopBar;
+import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.javabean.Picture;
 import com.example.facekilling.adapter.PictureAdapater;
 
@@ -36,6 +38,13 @@ import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu.MenuStateChangeListener;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
+import static android.content.Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT;
+import static com.example.facekilling.util.GetBitmap.deleteImgFile;
+import static com.example.facekilling.util.GetBitmap.deleteImgListFile;
+import static com.example.facekilling.util.GetBitmap.getAllPicFromUser;
+import static com.example.facekilling.util.StaticConstant.TACK_PICTURE_TO_COF;
+import static com.example.facekilling.util.StaticConstant.TMP_IMG_FILE;
+
 public class PicturesActivity extends AppCompatActivity  {
 
     private TopBar topBar;
@@ -50,25 +59,11 @@ public class PicturesActivity extends AppCompatActivity  {
 
 
 
-    private Picture[] pictures = {
-            new Picture(R.drawable.picture_01),
-            new Picture(R.drawable.picture_02),
-            new Picture(R.drawable.picture_03),
-            new Picture(R.drawable.picture_04),
-            new Picture(R.drawable.picture_05),
-            new Picture(R.drawable.picture_06),
-            new Picture(R.drawable.picture_07),
-            new Picture(R.drawable.picture_08),
-            new Picture(R.drawable.picture_09),
-            new Picture(R.drawable.picture_10),
-            new Picture(R.drawable.picture_11),
-            new Picture(R.drawable.picture_12),
-            new Picture(R.drawable.picture_13),
-            new Picture(R.drawable.picture_14),
-    };
     private List<Picture> picturesList = new ArrayList<>();
 
     private PictureAdapater adapter = new PictureAdapater(picturesList);
+    private SwipeRefreshLayout swipeRefresh;
+
 
     public static Context getContext() {
         return context;
@@ -78,6 +73,7 @@ public class PicturesActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_pictures);
         context = getApplicationContext();
+
         initPictures();
         monitor();
         initView();
@@ -86,16 +82,14 @@ public class PicturesActivity extends AppCompatActivity  {
 
     public void initView(){
         topBar = (TopBar) findViewById(R.id.menuPicturesTopBar);
+        if(picturesList.size() == 0) return;
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.pictures_recycler_view);
         GridLayoutManager layoutManger = new GridLayoutManager(this,2);
+
         adapter.setLongStatus(true);
         recyclerView.setLayoutManager(layoutManger);
         recyclerView.setAdapter(adapter);
-
-
         registerForContextMenu(recyclerView);
-
-
 
     }
     private void monitor(){
@@ -103,80 +97,15 @@ public class PicturesActivity extends AppCompatActivity  {
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
             public void leftClicked() {
-                Intent intent = new Intent(getContext(),IndexActivity.class);
-                startActivity(intent);
+                finish();
             }
 
             @Override
             public void rightClicked() {
-//                createPopMenu();
+
             }
         });
     }
-
-//    public boolean createPopMenu() {
-//        PopupMenu popupMenu = new PopupMenu(getContext(),topBar.getRightButt());
-//        popupMenu.getMenuInflater().inflate(R.menu.picture_menu,popupMenu.getMenu());
-//        popupMenu.show();
-//        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                onPopItemSelected(item);
-//                return false;
-//            }
-//        });
-//        return true;
-//    }
-
-
-
-//    public void onPopItemSelected(MenuItem item) {
-//        switch(item.getItemId()) {
-//            case R.id.picture_choose:
-//                //多选
-//                if(!multiChoose){
-//                    adapter.setCheckBoxVisiable(true);
-//                    multiChoose = true;
-//                }
-//                else{
-//                    adapter.setCheckBoxVisiable(false);
-//                    multiChoose = false;
-//                }
-//                initView();
-//                break;
-//            case R.id.picture_delete:
-//                //删除
-//                Iterator<Picture> iter = picturesList.iterator();
-//                while(iter.hasNext()){
-//                    Picture it= iter.next();
-//                    if(it.isChecked()){
-//                        iter.remove();
-//                    }
-//                }
-//                initView();
-//                break;
-//            case R.id.picture_export:
-//                //分享
-//                List<Picture> mPictureList = new ArrayList<>();
-//                for(Picture p:picturesList){
-//                    if(p.isChecked()){
-//                        mPictureList.add((Picture)p.clone());
-//                    }
-//                }
-//                //如果选择了图片
-//                if(mPictureList.size() != 0){
-//                    Intent intent = new Intent(PicturesActivity.this,CofActivity.class);
-//                    intent.putExtra("PictureList",(Serializable)mPictureList);
-//                    startActivity(intent);
-//                }
-//                else{
-//                    Toast.makeText(getContext(), "请选择图片进行分享", Toast.LENGTH_SHORT).show();
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-//    }
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
@@ -188,15 +117,16 @@ public class PicturesActivity extends AppCompatActivity  {
         int position = adapter.getLongPosition();
         switch (item.getItemId()) {
             case R.id.item_delete:
+                deleteImgFile(picturesList.get(position).getImagePath());
                 picturesList.remove(position);
                 initView();
                 break;
             case R.id.item_export:
-                //之后发送到云端，cof从云端获取
-                List<Picture> mPictureList = new ArrayList<>();
-                mPictureList.add((Picture)picturesList.get(position).clone());
+                List<String> picPathList = new ArrayList<>();
+                picPathList.add(picturesList.get(position).getImagePath());
                 Intent intent = new Intent(PicturesActivity.this,CofActivity.class);
-                intent.putExtra("PictureList",(Serializable)mPictureList);
+                intent.putExtra("tack",TACK_PICTURE_TO_COF);
+                intent.putExtra("picPathList", (Serializable) picPathList);
                 startActivity(intent);
                 finish();
                 break;
@@ -208,15 +138,26 @@ public class PicturesActivity extends AppCompatActivity  {
 
     private void initPictures(){
         picturesList.clear();
-        for(int i=0;i<50;i++){
-            Random random = new Random();
-            int index = random.nextInt(pictures.length);
-            picturesList.add((Picture)pictures[index].clone());
-        }
+        picturesList.addAll(getAllPicFromUser(MainUser.getInstance().getUser_id()));
     }
 
     public void refresh() {
         onCreate(null);
+        new Thread(new Runnable() {
+            public void run() {
+                try{
+                    Thread.sleep(2000);
+                }catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable(){
+                    public void run(){
+                        adapter.notifyDataSetChanged();
+                        swipeRefresh.setRefreshing(false);
+                    }
+                });
+            }
+        }).start();
     }
 
     // 右下角的菜单
@@ -258,6 +199,7 @@ public class PicturesActivity extends AppCompatActivity  {
                 .addSubActionView(rLSubBuilder.setContentView(rlIcon3,starParams).build())
                 .attachTo(rightLowerButton).build();
 
+        if(picturesList.size() == 0) return;
         rightLowerMenu.setStateChangeListener(new MenuStateChangeListener() {
 
             @Override
@@ -299,8 +241,9 @@ public class PicturesActivity extends AppCompatActivity  {
                 else{
                     adapter.setCheckBoxVisiable(false);
                     multiChoose = false;
+                    rightLowerMenu.close(true);
                 }
-                initView();
+                adapter.notifyDataSetChanged();
             }
         });
         //删除
@@ -309,14 +252,19 @@ public class PicturesActivity extends AppCompatActivity  {
             @Override
             public void onClick(View view) {
                 rightLowerMenu.close(true);
+                List<Picture> deleteImgLis = new ArrayList<>();
                 Iterator<Picture> iter = picturesList.iterator();
                 while(iter.hasNext()){
                     Picture it= iter.next();
                     if(it.isChecked()){
                         iter.remove();
+                        deleteImgLis.add(it);
                     }
                 }
-                initView();
+                deleteImgListFile(deleteImgLis);
+                adapter.setCheckBoxVisiable(false);
+                multiChoose = false;
+                adapter.notifyDataSetChanged();
             }
         });
         //分享
@@ -325,19 +273,18 @@ public class PicturesActivity extends AppCompatActivity  {
             @Override
             public void onClick(View view) {
                 rightLowerMenu.close(true);
-                List<Picture> mPictureList = new ArrayList<>();
+                List<String> picPathList = new ArrayList<>();
                 for(Picture p:picturesList){
                     if(p.isChecked()){
-                        mPictureList.add((Picture)p.clone());
+                        picPathList.add(p.getImagePath());
                     }
                 }
                 //如果选择了图片
-                if(mPictureList.size() != 0){
+                if(picPathList.size() != 0){
                     Intent intent = new Intent(PicturesActivity.this,CofActivity.class);
-                    intent.putExtra("PictureList",(Serializable)mPictureList);
+                    intent.putExtra("tack",TACK_PICTURE_TO_COF);
+                    intent.putExtra("picPathList", (Serializable) picPathList);
                     startActivity(intent);
-                    Intent intent_1 = new Intent(IndexActivity.getContext(), CofActivity.class);
-                    startActivityForResult(intent, StaticConstant.GETCOF_FROM_NEW);
                     finish();
                 }
                 else{

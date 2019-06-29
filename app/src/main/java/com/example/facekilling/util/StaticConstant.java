@@ -6,6 +6,12 @@ public class StaticConstant {
     public static final int GETBITMAP_FROM_SD = 2;
     public static final int GETCOF_FROM_NEW = 3;
     public static final int CAMERA_RETURN = 4;
+
+    public static final int TACK_DEFAULT= 10;
+    public static final int TACK_PICTURE_TO_COF = 11;
+
+    public static final String TMP_IMG_FILE = "image_tmp";
+
     public static final String FUNCTIONBUTT_REQUEST = "FunctionButtRequest";
     public static final String BITMAP_PATH = "BitmapPath";
     public static final String FRONT_IP = "http://";
@@ -27,4 +33,12 @@ public class StaticConstant {
     public static final String FRIEND_DELETE = FRONT_IP+IP+":"+PORT+"/friend/delete/";
     public static final String SEND_MSG = FRONT_IP+IP+":"+PORT+"/information/send/";
     public static final String REFRESH_MSG = FRONT_IP+IP+":"+PORT+"/information/refresh/";
+    public static final String SEND_COF_MESSAGE = FRONT_IP+IP+":"+PORT+"/forum/send/";
+    public static final String SEND_COF_IMG = FRONT_IP+IP+":"+PORT+"/forum/sendIMG/";
+    public static final String READ_COF = FRONT_IP+IP+":"+PORT+"/forum/receive/";
+    public static final String DELETE_COF = FRONT_IP+IP+":"+PORT+"/forum/delete/";
+    public static final String COF_LIKE = FRONT_IP+IP+":"+PORT+"/forum/like/";
+    public static final String COF_UNLIKE = FRONT_IP+IP+":"+PORT+"/forum/unlike/";
+    public static final String COF_COMMENT = FRONT_IP+IP+":"+PORT+"/forum/comment/";
+    public static final String COF_REMOVE_COMMENT = FRONT_IP+IP+":"+PORT+"/forum/removeComment/";
 }

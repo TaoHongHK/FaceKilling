@@ -31,7 +31,8 @@ public class ProfileActivity extends AppCompatActivity {
         changeAvatar = (TextView) findViewById(R.id.activity_profile_changeAvatar);
         backImg = (ImageView) findViewById(R.id.activity_profile_back);
 
-        userAvatar.setImageDrawable(getResources().getDrawable(MainUser.getInstance().getImageId()));
+        //userAvatar.setImageDrawable(getResources().getDrawable(MainUser.getInstance().getImageId()));
+        userAvatar.setImageBitmap(MainUser.getInstance().getImageBitMap());
         userName.setText(MainUser.getInstance().getUser_name());
         backImg.setOnClickListener(new View.OnClickListener() {
             @Override

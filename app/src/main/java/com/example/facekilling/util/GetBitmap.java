@@ -58,15 +58,8 @@ public class GetBitmap {
         }else return pickPath;
     }
 
-    //获取相机的基本路径
-    public static String getBaseFilePath(){
-        String sdStatus = Environment.getExternalStorageState();
-        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
-            return null;
-        }
-        String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+"Camera";
-        return baseFilePath;
-    }
+
+
 
     //获取用户本地存储的基本路径
     public static String getUserFilePath(int id){
@@ -77,7 +70,6 @@ public class GetBitmap {
         String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+id;
         return baseFilePath;
     }
-
     //存储图片到用户id文件夹下
     public static String savePicToUser(final Bitmap bitmap,final int id,final Activity activity,final Context context){
         final String[] mBitMapPath = {null};
@@ -119,8 +111,41 @@ public class GetBitmap {
         }).start();
         return mBitMapPath[0];
     }
-    //存储图片到camera下
-    public static String savePicToCamera(final Bitmap bitmap,final Activity activity,final Context context){
+    //获取用户id文件夹下的所有图片
+    public static List<Picture> getAllPicFromUser(int id){
+        List<Picture> pictureList = new ArrayList<>();
+        String imagePath = getUserFilePath(id);
+        File fileAll = new File(imagePath);
+        File[] files = fileAll.listFiles();
+        if(files == null){
+            return pictureList;
+        }
+        // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+            if (checkIsImageFile(file.getPath())) {
+                Bitmap bitmap= BitmapFactory.decodeFile(file.getPath(),getBitmapOption(4));
+                pictureList.add(new Picture(bitmap,imagePath,file.getName()));
+
+            }
+        }
+        // 返回得到的图片列表
+        return pictureList;
+    }
+
+
+
+    //获取文件的基本路径
+    public static String getBaseFilePath(String filename){
+        String sdStatus = Environment.getExternalStorageState();
+        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+            return null;
+        }
+        String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "FaceK"+File.separator+filename;
+        return baseFilePath;
+    }
+    //存储图片到自定义文件夹下
+    public static String savePicToFile(final Bitmap bitmap,final String filename,final Activity activity,final Context context){
         final String[] mBitMapPath = {null};
         new Thread(new Runnable() {
             @Override
@@ -130,7 +155,7 @@ public class GetBitmap {
                     return;
                 }
                 FileOutputStream fileOutputStream = null;
-                String baseFilePath = getBaseFilePath();
+                String baseFilePath = getBaseFilePath(filename);
                 File baseFile = new File(baseFilePath);
                 if (!baseFile.exists()) {
                     baseFile.mkdirs();
@@ -141,6 +166,7 @@ public class GetBitmap {
                     fileOutputStream = new FileOutputStream(picFile);
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
                     MediaStore.Images.Media.insertImage(context.getContentResolver(), picFile.getPath(), pickName, "description");
+
                     Uri uri = Uri.fromFile(picFile);
                     activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
                     mBitMapPath[0] = picFile.getPath();
@@ -160,25 +186,117 @@ public class GetBitmap {
         }).start();
         return mBitMapPath[0];
     }
+    //存储图片列表到自定义文件夹下
+    public static void savePicListToFile(final List<Picture> pictureList,final String filename,final Activity activity,final Context context){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String sdStatus = Environment.getExternalStorageState();
+                if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+                    return;
+                }
+                FileOutputStream fileOutputStream = null;
+                String baseFilePath = getBaseFilePath(filename);
+                File baseFile = new File(baseFilePath);
+                if (!baseFile.exists()) {
+                    baseFile.mkdirs();
+                }
 
-    //获取用户id文件夹下的所有图片
-    public static List<Picture> getAllPicFromUser(int id){
+                try {
+                    for(int i=0;i<pictureList.size();i++){
+                        Picture picture = pictureList.get(i);
+                        String pickName = GetSysTime.getCurrTime()+ i +".jpg";
+                        File picFile = new File(baseFile,pickName);
+                        fileOutputStream = new FileOutputStream(picFile);
+                        picture.getImageBitMap().compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                        MediaStore.Images.Media.insertImage(context.getContentResolver(), picFile.getPath(), pickName, "description");
+//                        fileOutputStream.flush();
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }catch (NullPointerException ne){
+                        ne.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+    //获取自定义文件夹下所有的照片
+    public static List<Picture> getAllPicFromUser(String filename){
         List<Picture> pictureList = new ArrayList<>();
-        String imagePath = getUserFilePath(id);
+        String imagePath = getBaseFilePath(filename);
         File fileAll = new File(imagePath);
         File[] files = fileAll.listFiles();
+        if(files == null){
+            return pictureList;
+        }
         // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
         for (int i = 0; i < files.length; i++) {
             File file = files[i];
             if (checkIsImageFile(file.getPath())) {
                 Bitmap bitmap= BitmapFactory.decodeFile(file.getPath(),getBitmapOption(4));
                 pictureList.add(new Picture(bitmap,imagePath,file.getName()));
-
             }
         }
         // 返回得到的图片列表
         return pictureList;
     }
+
+
+
+    //删除本地图片
+    public static void deleteImgFile(final String imgPath) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file = new File(imgPath);
+                // 路径为文件且不为空则进行删除
+                if (file.isFile() && file.exists()) {
+                    file.delete();
+                }
+            }
+        }).start();
+    }
+    //删除本地图片列表
+    public static void deleteImgListFile(final List<Picture> pictureList){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(Picture picture:pictureList){
+                    File file = new File(picture.getImagePath());
+                    // 路径为文件且不为空则进行删除
+                    if (file.isFile() && file.exists()) {
+                        file.delete();
+                    }
+                }
+            }
+        }).start();
+    }
+    //删除本地文件夹
+    public static void deleteFilePackage(final String filename){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String baseFile = getBaseFilePath(filename);
+                File fileAll = new File(baseFile);
+                File[] files = fileAll.listFiles();
+                for(File file:files){
+                    if (file.isFile() && file.exists()) {
+                        file.delete();
+                    }
+                }
+
+            }
+        }).start();
+
+    }
+
     //压缩文件的操作
     private static BitmapFactory.Options getBitmapOption(int inSampleSize) {
         System.gc();
@@ -238,17 +356,6 @@ public class GetBitmap {
         return false;
     }
 
-    //删除本地图片
-    public boolean deleteFile(String imgPath) {
-        boolean flag = false;
-        File file = new File(imgPath);
-        // 路径为文件且不为空则进行删除
-        if (file.isFile() && file.exists()) {
-            file.delete();
-            flag = true;
-        }
-        return flag;
-    }
 
 
 }

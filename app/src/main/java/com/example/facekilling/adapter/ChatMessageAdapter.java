@@ -50,12 +50,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         if (x.left) {//判断该信息该信息是显示在左边还是右边，如果要在左边显示则把右边的部分隐藏
             holder.leftlin.setVisibility(View.VISIBLE);
             holder.rightlin.setVisibility(View.GONE);//把右边的隐藏
-            holder.leftimg.setImageResource(x.img);
+            holder.leftimg.setImageBitmap(x.img);
             holder.lefttext.setText(x.text);
         }else{
             holder.rightlin.setVisibility(View.VISIBLE);
             holder.leftlin.setVisibility(View.GONE);//把左边的隐藏
-            holder.leftimg.setImageResource(x.img);
+            holder.leftimg.setImageBitmap(x.img);
             holder.lefttext.setText(x.text);
         }
         Log.d("MainActivity", "onBind");
