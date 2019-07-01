@@ -52,7 +52,8 @@ public class FaceKCamera extends AppCompatActivity {
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
-    private int viewWidth, viewHeight;
+    //private static final int viewWidth = 640, viewHeight = 480;
+    private int viewWidth,viewHeight;
     private int frontCameraId;
     private int backCameraId;
     private int numberOfCameras;
@@ -65,6 +66,7 @@ public class FaceKCamera extends AppCompatActivity {
     private Button reTakeButt;
     private Button chosenButt;
     private String mBitMapPath;
+    private int biaoQingIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +116,7 @@ public class FaceKCamera extends AppCompatActivity {
                 //mCamera.autoFocus(autoFocusCallback);
                 mCamera.autoFocus(new Camera.AutoFocusCallback() {
                     @Override
-                    public void onAutoFocus(boolean success, Camera camera) {
+                    public void onAutoFocus(boolean success, Camera acamera) {
                         Toast toast = Toast.makeText(getApplicationContext(),"聚焦",Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.TOP,0,0);
                         toast.show();
@@ -149,6 +151,7 @@ public class FaceKCamera extends AppCompatActivity {
                 Intent intent = new Intent();
                 /*intent.putExtra("imgBitmap", BitMap2Util.BitMap2ByteArray(mBitMap));*/
                 intent.putExtra(StaticConstant.BITMAP_PATH,mBitMapPath);
+                intent.putExtra("biaoQingIndex",biaoQingIndex);
                 FaceKCamera.this.setResult(StaticConstant.CAMERA_RETURN,intent);
                 FaceKCamera.this.finish();
             }
@@ -193,15 +196,16 @@ public class FaceKCamera extends AppCompatActivity {
             try {
                 Camera.Parameters parameters = mCamera.getParameters();
                 //设置预览照片的大小
-                parameters.setPreviewFpsRange(viewWidth, viewHeight);
+                parameters.setPreviewSize(viewWidth, viewHeight);
                 //设置相机预览照片帧数
                 parameters.setPreviewFpsRange(4, 10);
                 //设置图片格式
                 parameters.setPictureFormat(ImageFormat.JPEG);
                 //设置图片的质量
-                parameters.set("jpeg-quality", 20);
+                parameters.set("jpeg-quality", 85);
                 //设置照片的大小
                 parameters.setPictureSize(viewWidth, viewHeight);
+
                 //通过SurfaceView显示预览
                 mCamera.setPreviewDisplay(mSurfaceHolder);
                 //开始预览
@@ -226,7 +230,7 @@ public class FaceKCamera extends AppCompatActivity {
                 //设置图片格式
                 parameters.setPictureFormat(ImageFormat.JPEG);
                 //设置图片的质量
-                parameters.set("jpeg-quality", 90);
+                parameters.set("jpeg-quality", 85);
                 //设置照片的大小
                 parameters.setPictureSize(viewWidth, viewHeight);
                 //通过SurfaceView显示预览
@@ -283,10 +287,33 @@ public class FaceKCamera extends AppCompatActivity {
                     resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null) {
                 Log.d("timeTest", "run: 开始保存图片"+GetSysTime.getCurrTime());
+                saveTempPic(bitmap);
                 savePic(bitmap);
             }
         }
     };
+
+    public void saveTempPic(final Bitmap bitmap){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String sdStatus = Environment.getExternalStorageState();
+                if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+                    return;
+                }
+                String baseFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() +
+                        File.separator + "FaceK"+File.separator+ "CompressedPics";
+                File baseFile = new File(baseFilePath);
+                if (!baseFile.exists()) {
+                    baseFile.mkdirs();
+                }
+                String pickName = GetSysTime.getCurrTime() +".jpg";
+                File picFile = new File(baseFile,pickName);
+                GetBitmap.transImage(bitmap,picFile.getAbsolutePath(),480,640,50);
+                savePicCallBackHandle.obtainMessage(CAMERA_WHAT,picFile.getAbsolutePath()).sendToTarget();
+            }
+        }).start();
+    }
 
     public void savePic(final Bitmap bitmap){
         new Thread(new Runnable() {
@@ -307,11 +334,10 @@ public class FaceKCamera extends AppCompatActivity {
                 try {
                     File picFile = new File(baseFile,pickName);
                     fileOutputStream = new FileOutputStream(picFile);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
                     MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
                     Uri uri = Uri.fromFile(picFile);
                     sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
-                    savePicCallBackHandle.obtainMessage(CAMERA_WHAT,picFile.getAbsolutePath()).sendToTarget();
                     Log.d("timeTest", "run: 已保存图片 "+GetSysTime.getCurrTime());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -367,6 +393,8 @@ public class FaceKCamera extends AppCompatActivity {
         mBitMapPath = bitmapPath;
     }
 
+
+
     private class SavePicCallBackHandle extends Handler{
         private FaceKCamera faceKCamera;
         private String bitmapPath;
@@ -417,9 +445,9 @@ public class FaceKCamera extends AppCompatActivity {
         ImageView rlIcon4 = new ImageView(this);
         // 设置弹出菜单的图标
 
-        rlIcon1.setImageResource(R.drawable.emoji_happy);
+        rlIcon1.setImageResource(R.drawable.emoji_nature);
         rlIcon2.setImageResource(R.drawable.emoji_angry);
-        rlIcon3.setImageResource(R.drawable.emoji_sad);
+        rlIcon3.setImageResource(R.drawable.emoji_happy);
         rlIcon4.setImageResource(R.drawable.emoji_surprise);
 
 //        // 设置菜单按钮Button的宽、高，边距
@@ -465,20 +493,19 @@ public class FaceKCamera extends AppCompatActivity {
             }
         });
 
-        //各种响应
-        //多选
         rlIcon1.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
+                biaoQingIndex = 3;
                 rightLowerMenu.close(true);
             }
         });
-        //删除
         rlIcon2.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
+                biaoQingIndex = 2;
                 rightLowerMenu.close(true);
             }
         });
@@ -487,6 +514,7 @@ public class FaceKCamera extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
+                biaoQingIndex = 1;
                 rightLowerMenu.close(true);
             }
         });
@@ -495,6 +523,7 @@ public class FaceKCamera extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
+                biaoQingIndex = 0;
                 rightLowerMenu.close(true);
             }
         });

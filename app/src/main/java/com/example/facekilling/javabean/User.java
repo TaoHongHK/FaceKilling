@@ -99,12 +99,6 @@ public class User implements Serializable {
         return user_id;
     }
 
-
-    public void setImageId(int imageId) {
-        this.imageId = imageId;
-    }
-
-
     public void setUser_id(int user_id) {
         this.user_id = user_id;
     }
@@ -112,4 +106,29 @@ public class User implements Serializable {
     public void setImageBitMap(Bitmap imageBitMap) {
         this.imageBitMap = imageBitMap;
     }
+
+    public void setPassword(String password){
+        this.password = password;
+    }
+
+    public void setEmail(String email){
+        this.email = email;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
 }

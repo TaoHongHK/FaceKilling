@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.facekilling.R;
@@ -19,51 +20,48 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView leftimg, rightimg;
         TextView lefttext, righttext;
-        ViewGroup leftlin, rightlin;
+        LinearLayout leftLingerLayout,rightLingerLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            leftlin = itemView.findViewById(R.id.left);
-            leftimg = itemView.findViewById(R.id.leftimg);
-            lefttext = itemView.findViewById(R.id.lefttext);
-            rightlin = itemView.findViewById(R.id.right);
-            rightimg = itemView.findViewById(R.id.rightimg);
-            righttext = itemView.findViewById(R.id.righttext);
+            leftimg = (ImageView) itemView.findViewById(R.id.chat_left_img);
+            lefttext = (TextView) itemView.findViewById(R.id.chat_left_text);
+            rightimg = (ImageView) itemView.findViewById(R.id.chat_right_img);
+            righttext = (TextView) itemView.findViewById(R.id.chat_right_text);
+            leftLingerLayout = (LinearLayout) itemView.findViewById(R.id.chat_msg_left);
+            rightLingerLayout =  (LinearLayout) itemView.findViewById(R.id.chat_msg_right);
         }
     }
 
-    public ChatMessageAdapter(List l) {
-        list = l;
+    public ChatMessageAdapter(List<ChatMessage> list) {
+        this.list = list;
     }
 
     @Override
     public ChatMessageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_show, parent, false);
-        ViewHolder h = new ViewHolder(v);
-        Log.d("MainActivity", "onCreate");
-        return h;
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_item, parent, false);
+        ViewHolder viewHolder = new ViewHolder(v);
+        return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {//滑动RecyclerView出发的事件
-        ChatMessage x = list.get(position);
-        if (x.left) {//判断该信息该信息是显示在左边还是右边，如果要在左边显示则把右边的部分隐藏
-            holder.leftlin.setVisibility(View.VISIBLE);
-            holder.rightlin.setVisibility(View.GONE);//把右边的隐藏
-            holder.leftimg.setImageBitmap(x.img);
-            holder.lefttext.setText(x.text);
+        ChatMessage message = list.get(position);
+        if (message.getType() == ChatMessage.TYPE_RECEIVE) {//判断该信息该信息是显示在左边还是右边，如果要在左边显示则把右边的部分隐藏
+            holder.leftLingerLayout.setVisibility(View.VISIBLE);
+            holder.rightLingerLayout.setVisibility(View.GONE);//把右边的隐藏
+            holder.leftimg.setImageBitmap(message.getImg());
+            holder.lefttext.setText(message.getContent());
         }else{
-            holder.rightlin.setVisibility(View.VISIBLE);
-            holder.leftlin.setVisibility(View.GONE);//把左边的隐藏
-            holder.leftimg.setImageBitmap(x.img);
-            holder.lefttext.setText(x.text);
+            holder.rightLingerLayout.setVisibility(View.VISIBLE);
+            holder.leftLingerLayout.setVisibility(View.GONE);//把左边的隐藏
+            holder.rightimg.setImageBitmap(message.getImg());
+            holder.righttext.setText(message.getContent());
         }
-        Log.d("MainActivity", "onBind");
     }
 
     @Override
     public int getItemCount() {//这里要重写一下 不然不会显示任何信息
-        Log.d("asdasd", "" + list.size());
         return list.size();
     }
 }

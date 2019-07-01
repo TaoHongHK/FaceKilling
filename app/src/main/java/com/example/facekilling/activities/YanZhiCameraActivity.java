@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.facekilling.R;
 import com.example.facekilling.javabean.Face;
@@ -114,6 +116,11 @@ public class YanZhiCameraActivity extends Activity {
                     faceHat.setText(face.getHat());
                 }
             });
+        }
+        else{
+            Toast toast = Toast.makeText(getApplicationContext(),"没有检测到人脸，哈哈",Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.TOP,0,0);
+            toast.show();
         }
     }
 

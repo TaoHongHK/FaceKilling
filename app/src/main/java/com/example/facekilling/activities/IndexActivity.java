@@ -37,6 +37,8 @@ public class IndexActivity extends AppCompatActivity {
 
     private static final int TAB_COUNT = 2;
 
+    private static IndexActivity indexActivity;
+
     private DrawerLayout drawerLayout;
     private FragmentTabHost mTabHost;
 
@@ -52,10 +54,16 @@ public class IndexActivity extends AppCompatActivity {
         return context;
     }
 
+    public static IndexActivity getIndexActivity(){
+        return indexActivity;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_index);
+
+        indexActivity = this;
 
         context = getApplicationContext();
 
@@ -165,14 +173,6 @@ public class IndexActivity extends AppCompatActivity {
                     case R.id.nav_profile:
                         drawerLayout.closeDrawers();
                         enterProfile();
-                        break;
-                    case R.id.nav_mail:
-                        Toast.makeText(getContext(),"click the mail",Toast.LENGTH_SHORT).show();
-                        drawerLayout.closeDrawers();
-                        break;
-                    case R.id.nav_settings:
-                        Toast.makeText(getContext(),"click the setting",Toast.LENGTH_SHORT).show();
-                        drawerLayout.closeDrawers();
                         break;
                     case R.id.nav_pictures:
                         drawerLayout.closeDrawers();

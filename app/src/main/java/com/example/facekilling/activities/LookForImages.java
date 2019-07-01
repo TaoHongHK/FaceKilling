@@ -74,6 +74,10 @@ public class LookForImages extends AppCompatActivity {
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
             public void leftClicked() {
+                List<String> picPathList = new ArrayList<>();
+                Intent intent = new Intent();
+                intent.putExtra("picPathList", (Serializable) picPathList);
+                setResult(GETBITMAP_FROM_APP,intent);
                 finish();
             }
 

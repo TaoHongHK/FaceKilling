@@ -16,13 +16,17 @@ import java.util.List;
 public class FriendAdapter extends ArrayAdapter<Friend> {
 
     private Context context;
+    private List<Friend> friends;
+    private int longPos = -1;
 
     public FriendAdapter(Context context,List<Friend> objects) {
         super(context, R.layout.friend_item, objects);
         this.context = context;
+        this.friends = objects;
     }
 
-    public View getView(int position, View convertView, ViewGroup parent){
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent){
         Friend friend = getItem(position);
 
         ViewHolder viewHolder;
@@ -52,9 +56,20 @@ public class FriendAdapter extends ArrayAdapter<Friend> {
         return convertView;
     }
 
+
+
+    @Override
+    public int getCount() {
+        return friends.size();
+    }
+
     private static class ViewHolder {
         TextView name;
         TextView message;
         ImageView avatar;
+    }
+
+    public int getLongPos(){
+        return longPos;
     }
 }

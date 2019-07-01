@@ -18,6 +18,7 @@
         <attr name="leftButtHeight" format="dimension"/>
         <attr name="leftButtIcon" format="reference|color"/>
         <attr name="leftButtVisible" format="boolean"/>
+        <attr name="leftButtText" format="string"/>
         //右边文本 右边文本颜色 是否可见
         <attr name="rightText" format="string"/>
         <attr name="rightTextColor" format="color"/>
@@ -28,5 +29,6 @@
         <attr name="rightButtHeight" format="dimension"/>
         <attr name="rightButtIcon" format="reference|color"/>
         <attr name="rightButtVisible" format="boolean"/>
+        <attr name="rightButtText" format="string" />
     </declare-styleable>
 </resources>

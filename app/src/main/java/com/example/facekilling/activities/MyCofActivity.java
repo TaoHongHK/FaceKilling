@@ -1,6 +1,7 @@
 package com.example.facekilling.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,10 +21,19 @@ import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.javabean.Picture;
 import com.example.facekilling.javabean.User;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static com.example.facekilling.util.GetBitmap.getBitmapFromSD;
+import static com.example.facekilling.util.OkHttpUtils.getCofList;
+import static com.example.facekilling.util.StaticConstant.TACK_DEFAULT;
+import static com.example.facekilling.util.StaticConstant.TACK_PICTURE_TO_COF;
 
 public class MyCofActivity extends AppCompatActivity {
 
@@ -33,11 +43,16 @@ public class MyCofActivity extends AppCompatActivity {
 
     //存储我的朋友圈的cof信息
     private List<Cof> myCofList = new ArrayList<>();
+    private int nowPosition;
 
-    private CofAdapter cofadapter;
+    private RecyclerView mRecyclerView;
+
+    private CofAdapter cofadapter = new CofAdapter(MyCofActivity.this,myCofList);
 
     //下拉刷新
     private SwipeRefreshLayout swipeRefresh;
+
+    private int id;
 
 
     @Override
@@ -45,21 +60,43 @@ public class MyCofActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_cof);
 
-        //接受数据
-        initCofList();
-        initView();
+        Intent intent = getIntent();
+        id = intent.getIntExtra("cofUserId",0);
         //各种监控事件
+        monitorMain();
+        //接受数据
+        initCofList(id);
+        initView();
+        if(myCofList.size() == 0) return;
+
         monitor();
+
     }
 
-    public void initCofList(){
-        //TODO:从服务器段获取登陆用户自己的cof
+    public void initCofList(int id){
+        if(id == 0){
+            return;
+        }
+        myCofList.clear();
+        List<Cof> newCofList = new ArrayList<>();
+        try {
+            List<Cof> cofList = getCofList(id,0);
+            newCofList.addAll(cofList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        myCofList.addAll(newCofList);
+        cofadapter.notifyDataSetChanged();
+        nowPosition = myCofList.size();
     }
 
     public void initView(){
         topBar = (TopBar) findViewById(R.id.myCofTopBar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
-
 
         //背景
         ImageView imageview = findViewById(R.id.myCof_background);
@@ -75,16 +112,15 @@ public class MyCofActivity extends AppCompatActivity {
 
         if(myCofList.size() == 0) return;
         //卡片式显示朋友圈
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.myCof_recycler_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.myCof_recycler_view);
         GridLayoutManager layoutManger = new GridLayoutManager(MyCofActivity.this,1);
         layoutManger.setAutoMeasureEnabled(true);
-        recyclerView.setLayoutManager(layoutManger);
-        cofadapter = new CofAdapter(MyCofActivity.this,myCofList);
-        recyclerView.setAdapter(cofadapter);
+        mRecyclerView.setLayoutManager(layoutManger);
+
+        mRecyclerView.setAdapter(cofadapter);
 
     }
-
-    private void monitor(){
+    private  void monitorMain(){
         topBar = (TopBar) findViewById(R.id.myCofTopBar);
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
@@ -102,7 +138,41 @@ public class MyCofActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
 
+    private void monitor(){
+
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            //判断是不是往上拖动
+            public boolean isLastReflash;
+
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                /*
+                 * 滑动停止之后检测是否滑动到底部
+                 * */
+                if(newState == RecyclerView.SCROLL_STATE_IDLE &&isLastReflash){
+                    if(mRecyclerView.computeVerticalScrollExtent()+recyclerView.computeVerticalScrollOffset()>=recyclerView.computeVerticalScrollRange()){
+                        // Toast.makeText(getContext(),"滑动到底部",Toast.LENGTH_SHORT).show();
+                        //滑动到底部的时候一般要做加载更多的数据的操作...
+                        loadMoreCof(nowPosition);
+                        cofadapter.notifyDataSetChanged();
+                    }
+                }
+            }
+            //根据dy，dx可以判断是往哪个方向滑动
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy>0){
+                    isLastReflash = true;
+                }else{
+                    isLastReflash = false;
+                }
+            }
+        });
 
 
 
@@ -119,5 +189,22 @@ public class MyCofActivity extends AppCompatActivity {
                 });
             }
         }).start();
+    }
+
+    public void loadMoreCof(int index){
+        List<Cof> newCofList = new ArrayList<>();
+        try {
+            List<Cof> cofList = getCofList(-1,index);
+            newCofList.addAll(cofList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        myCofList.addAll(newCofList);
+        cofadapter.notifyDataSetChanged();
+        nowPosition = myCofList.size();
     }
 }

@@ -6,14 +6,6 @@
             android:icon="@drawable/personal_menu"
             android:title="profile" />
         <item
-            android:id="@+id/nav_mail"
-            android:icon="@drawable/mail_menu"
-            android:title="mail" />
-        <item
-            android:id="@+id/nav_settings"
-            android:icon="@drawable/settings_menu"
-            android:title="settings" />
-        <item
             android:id="@+id/nav_pictures"
             android:icon="@drawable/pictures_menu"
             android:title="pictures" />

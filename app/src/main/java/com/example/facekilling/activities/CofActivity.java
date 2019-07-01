@@ -52,6 +52,9 @@ import java.util.Random;
 import static com.example.facekilling.util.GetBitmap.deleteFilePackage;
 import static com.example.facekilling.util.GetBitmap.getAllPicFromUser;
 import static com.example.facekilling.util.GetBitmap.getBitmapFromSD;
+import static com.example.facekilling.util.GetBitmap.getSuoLueBitmapFromSD;
+import static com.example.facekilling.util.OkHttpUtils.postSendCofImgList;
+import static com.example.facekilling.util.OkHttpUtils.postSendCofMessage;
 import static com.example.facekilling.util.StaticConstant.TACK_DEFAULT;
 import static com.example.facekilling.util.StaticConstant.TACK_PICTURE_TO_COF;
 import static com.example.facekilling.util.StaticConstant.TMP_IMG_FILE;
@@ -70,6 +73,7 @@ public class CofActivity extends AppCompatActivity {
     private EditText editText;
 
     private RecyclerView recyclerView;
+    private String content;
 
 
     private List<Picture> picturesList = new ArrayList<>();
@@ -137,7 +141,6 @@ public class CofActivity extends AppCompatActivity {
         linearLayout.setLayoutParams(lp);
     }
 
-
     private void monitor(){
         topBar = (TopBar) findViewById(R.id.cofActivityTopBar);
         ImageView head_photo = (ImageView) findViewById(R.id.cof_activity_head_photo);
@@ -160,8 +163,17 @@ public class CofActivity extends AppCompatActivity {
             public void rightClicked() {
                 String content = editText.getText().toString().trim();
                 if(!content.equals("") || picturesList.size() != 0){
-                    //TODO:写一个将这个新建的cof提交给服务器的函数
-                    Cof cof = new Cof(MainUser.getInstance().getUser_id(),content,picturesList);
+                    if(content.equals(""))
+                        content = " ";
+                    int cof_id = -1;
+                    try {
+                        cof_id= postSendCofMessage(MainUser.getInstance().getUser_id(),content);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if(picturesList.size() != 0){
+                        postSendCofImgList(cof_id,MainUser.getInstance().getUser_id(),picturesList);
+                    }
                     Intent intent = new Intent(CofActivity.this, IndexActivity.class);
                     intent.putExtra("id",3);
                     startActivity(intent);
@@ -235,7 +247,7 @@ public class CofActivity extends AppCompatActivity {
             case StaticConstant.GETBITMAP_FROM_CAMERA:
                 String bitmapPath = data.getStringExtra(StaticConstant.BITMAP_PATH);
                 if (bitmapPath!=null){
-                    picturesList.add(new Picture(getBitmapFromSD(bitmapPath)));
+                    picturesList.add(new Picture(getSuoLueBitmapFromSD(bitmapPath),bitmapPath));
                 }
                 setAdaptiveHeight();
                 adapter.notifyDataSetChanged();
@@ -243,7 +255,7 @@ public class CofActivity extends AppCompatActivity {
             case StaticConstant.GETBITMAP_FROM_APP:
                 List<String> picPathList = data.getStringArrayListExtra("picPathList");
                 for(int i=0;i<picPathList.size();i++){
-                    Bitmap bitmap = getBitmapFromSD(picPathList.get(i));
+                    Bitmap bitmap = getSuoLueBitmapFromSD(picPathList.get(i));
                     picturesList.add(new Picture(bitmap,picPathList.get(i)));
                 }
                 setAdaptiveHeight();
@@ -257,7 +269,7 @@ public class CofActivity extends AppCompatActivity {
                     c.moveToFirst();
                     int columnIndex = c.getColumnIndex(filePathColumns[0]);
                     String imagePath = c.getString(columnIndex);
-                    picturesList.add(new Picture(getBitmapFromSD(imagePath)));
+                    picturesList.add(new Picture(getSuoLueBitmapFromSD(imagePath),imagePath));
                     c.close();
                     setAdaptiveHeight();
                     adapter.notifyDataSetChanged();

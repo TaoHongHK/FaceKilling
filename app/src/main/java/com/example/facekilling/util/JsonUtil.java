@@ -5,7 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.example.facekilling.javabean.Cof;
 import com.example.facekilling.javabean.MainUser;
+import com.example.facekilling.javabean.Picture;
+import com.example.facekilling.javabean.Review;
 import com.example.facekilling.javabean.User;
 
 import org.json.JSONArray;
@@ -14,6 +17,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -83,7 +87,7 @@ public class JsonUtil {
         if (!"".equals(JsonInfo) && JsonInfo != null) {
             JSONObject json = new JSONObject(JsonInfo);
             error = json.getInt("error");
-            Log.d("Mlogin", "register error: "+json.getInt("error"));
+            Log.d("changeProfile", "register error: "+json.getInt("error"));
             if (error == 0) {
                 Log.d("Mlogin", "register id: " + json.getInt("id"));
                 result = json.getInt("id");
@@ -130,5 +134,63 @@ public class JsonUtil {
             error = json.getInt("error");
         }
         return error;
+    }
+
+    public static List<Cof> decodeCofListFromCofString(String string) throws JSONException, ParseException {
+        List<Cof> cofList = new ArrayList<>();
+        JSONObject json = new JSONObject(string);
+        JSONArray jsonCofArray = json.getJSONArray("forum");
+        int num = json.getInt("num");
+        for(int i=0;i<num;i++){
+            JSONObject jsonCof = jsonCofArray.getJSONObject(i);
+            int cof_id = jsonCof.getInt("id");
+            int userId = jsonCof.getInt("user_id");
+            String dateString = jsonCof.getString("dateTime");
+            //内容
+            String content = jsonCof.getString("describe");
+            //图片列表
+            JSONObject jsonImageObject = jsonCof.getJSONObject("image");
+            int image_num = jsonImageObject.getInt("num");
+            List<Picture> pictureList = new ArrayList<>();
+            if(image_num != 0){
+                JSONArray jsonImageArray = jsonImageObject.getJSONArray("image");
+                for(int j=0;j<image_num;j++){
+                    Bitmap bitmap = decodeImgFromImgString((String) jsonImageArray.get(j));
+                    pictureList.add(new Picture(bitmap));
+                }
+            }
+
+            //评论
+            JSONObject jsonReviewObject = jsonCof.getJSONObject("comment");
+            int review_num = jsonReviewObject.getInt("num");
+            List<Review> reviewList = new ArrayList<>();
+            if(review_num != 0){
+                JSONArray jsonReviewArray = jsonReviewObject.getJSONArray("comment");
+                for(int j=0;j<review_num;j++){
+                    JSONObject jsonReview = jsonReviewArray.getJSONObject(j);
+                    int review_id = jsonReview.getInt("id");
+                    int review_user_id = jsonReview.getInt("user_id");
+                    String review_content = jsonReview.getString("content");
+                    Review review = new Review(review_user_id,review_id,review_content);
+                    reviewList.add(review);
+                }
+            }
+
+            //点赞
+            JSONObject jsonLikeObject = jsonCof.getJSONObject("like");
+            int like_num = jsonLikeObject.getInt("num");
+            List<Integer> like_ids = new ArrayList<>();
+            if(like_num != 0){
+                JSONArray jsonLikeArray = jsonLikeObject.getJSONArray("like_id");
+                for(int j=0;j<like_num;j++){
+                    like_ids.add((Integer) jsonLikeArray.get(j));
+                }
+            }
+
+            Cof cof = new Cof(userId,content,dateString,pictureList,like_num,like_ids,reviewList);
+            cof.setCof_id(cof_id);
+            cofList.add(cof);
+        }
+        return cofList;
     }
 }

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -26,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetBitmap {
+
+    public static final String DEFAULT_TEMP_PIC_BASEPATH = "/storage"+File.separator+"emulated"+File.separator+"0"+File.separator+
+            "FaceK"+File.separator+"CompressedPics"+File.separator;
 
     public static Bitmap getBitmapFromSD(String path){
         File mFile=new File(path);
@@ -286,11 +290,13 @@ public class GetBitmap {
                 String baseFile = getBaseFilePath(filename);
                 File fileAll = new File(baseFile);
                 File[] files = fileAll.listFiles();
-                for(File file:files){
-                    if (file.isFile() && file.exists()) {
-                        file.delete();
+                if (files != null && files.length != 0)
+                    for(File file:files){
+                        if (file.isFile() && file.exists()) {
+                            file.delete();
+                        }
                     }
-                }
+                else Thread.interrupted();
 
             }
         }).start();
@@ -356,6 +362,64 @@ public class GetBitmap {
         return false;
     }
 
+    public static void transImage(Bitmap bitmap, String toFile, int width, int height, int quality)
+    {
+        try
+        {
+            int bitmapWidth = bitmap.getWidth();
+            int bitmapHeight = bitmap.getHeight();
+            // 缩放图片的尺寸
+            float scaleWidth = (float) width / bitmapWidth;
+            float scaleHeight = (float) height / bitmapHeight;
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleWidth, scaleHeight);
+            // 产生缩放后的Bitmap对象
+            Bitmap resizeBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, false);
+            // save file
+            File myCaptureFile = new File(toFile);
+            FileOutputStream out = new FileOutputStream(myCaptureFile);
+            if(resizeBitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)){
+                out.flush();
+                out.close();
+            }
+            if(!bitmap.isRecycled()){
+                bitmap.recycle();//记得释放资源，否则会内存溢出
+            }
+            if(!resizeBitmap.isRecycled()){
+                resizeBitmap.recycle();
+            }
+
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public static Bitmap getSuoLueBitmapFromSD(String path){
+        File mFile=new File(path);
+        //若该文件存在
+        if (mFile.exists()) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            // 获取这个图片的宽和高
+            Bitmap bitmap = BitmapFactory.decodeFile(path,options);
+            options.inJustDecodeBounds = false;
+            //计算缩放比
+            int be = (int)(options.outHeight / (float)400);
+            if (be <= 0)
+                be = 1;
+            options.inSampleSize = be;
+            //重新读入图片，注意这次要把options.inJustDecodeBounds 设为 false哦
+            bitmap=BitmapFactory.decodeFile(path,options);
+            return bitmap;
+        }
+        else return null;
+    }
 
 
 }

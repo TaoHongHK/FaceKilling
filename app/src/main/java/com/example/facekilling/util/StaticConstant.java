@@ -15,8 +15,10 @@ public class StaticConstant {
     public static final String FUNCTIONBUTT_REQUEST = "FunctionButtRequest";
     public static final String BITMAP_PATH = "BitmapPath";
     public static final String FRONT_IP = "http://";
-    public static final String IP = "10.14.172.138";
-    public static final String PORT = "8000";
+    //public static final String IP = "10.14.171.107";
+    //public static final String PORT = "8000";
+    public static final String IP= "web.facek.derryhub.club";
+    public static final String PORT = "80";
     public static final String GET_TEST = FRONT_IP + IP + ":"+PORT+"/test_get/";
     public static final String POST_TEST = FRONT_IP + IP + ":"+PORT+"/test_post/";
     public static final String FACE_ATTRIBUTE = FRONT_IP + IP + ":"+PORT+"/face/attribute/";

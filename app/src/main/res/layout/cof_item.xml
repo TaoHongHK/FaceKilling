@@ -31,14 +31,24 @@
                 android:id="@+id/cof_item_layout_head"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textColor="#4CA2D8"
+                android:textColor="@color/nameColor"
                 android:gravity="left"
                 android:textStyle="bold"
                 />
             <TextView
+                android:id="@+id/cof_item_layout_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/dateColor"
+                android:gravity="left"
+                />
+            <TextView
                 android:id="@+id/cof_item_layout_content"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textStyle="bold"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

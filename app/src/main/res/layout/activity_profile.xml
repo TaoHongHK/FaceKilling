@@ -72,8 +72,7 @@
               <EditText android:id="@+id/avatar_profile_input_name"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:inputType="textPersonName"
-                  android:hint="Name" />
+                  android:inputType="textPersonName" />
           </android.support.design.widget.TextInputLayout>
 
           <!-- Address Label -->
@@ -85,8 +84,7 @@
               <EditText android:id="@+id/avatar_profile_input_address"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:inputType="textPostalAddress"
-                  android:hint="Address" />
+                  android:inputType="textPostalAddress" />
           </android.support.design.widget.TextInputLayout>
 
 
@@ -100,8 +98,7 @@
               <EditText android:id="@+id/avatar_profile_input_email"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:inputType="textEmailAddress"
-                  android:hint="Email" />
+                  android:inputType="textEmailAddress" />
           </android.support.design.widget.TextInputLayout>
 
 
@@ -116,7 +113,6 @@
                   android:id="@+id/avatar_profile_input_mobile"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:hint="Mobile Number"
                   android:inputType="number" />
           </android.support.design.widget.TextInputLayout>
 
@@ -129,18 +125,19 @@
               <EditText android:id="@+id/avatar_profile_input_password"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:inputType="textPassword"
-                  android:hint="Password"/>
+                  android:inputType="textPassword" />
           </android.support.design.widget.TextInputLayout>
 
           <!-- save Button -->
           <android.support.v7.widget.AppCompatButton
               android:id="@+id/avatar_profile_btn_save"
-              android:layout_width="fill_parent"
+              android:layout_width="300dp"
               android:layout_height="wrap_content"
               android:layout_marginTop="24dp"
               android:layout_marginBottom="24dp"
+              android:layout_gravity="center"
               android:padding="12dp"
+              android:background="@drawable/shape_post"
               android:text="保存"/>
       </LinearLayout>
     </LinearLayout>

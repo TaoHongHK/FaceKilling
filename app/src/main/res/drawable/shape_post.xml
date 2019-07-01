@@ -7,8 +7,10 @@
     <solid
         android:color="@color/postButtColor"/>
 
-    <size
-        android:width="60dp"
-        android:height="30dp"/>
+    <padding
+        android:bottom="5dp"
+        android:top="5dp"
+        android:left="10dp"
+        android:right="10dp"/>
 
 </shape>

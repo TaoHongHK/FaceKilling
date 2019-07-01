@@ -3,18 +3,29 @@ package com.example.facekilling.javabean;
 import android.graphics.Bitmap;
 
 public class ChatMessage {
-    public String text;//信息内容
-    public Bitmap img;//头像的图片id
-    public boolean left = true;//控制信息显示在左边还有右边，默认左边
+    public static final int TYPE_RECEIVE = 0;
+    public static final int TYPE_SEND = 1;
 
-    public ChatMessage(String s, Bitmap i) {
-        text = s;
-        img = i;
+    private String content;//信息内容
+    private Bitmap img;//头像的图片id
+    private int type;
+
+
+    public ChatMessage(String content, Bitmap i, int type) {
+        this.content = content;
+        this.img = i;
+        this.type = type;
     }
 
-    public ChatMessage(String s, Bitmap i, boolean b) {
-        text = s;
-        img = i;
-        left = b;
+    public String getContent(){
+        return content;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public Bitmap getImg(){
+        return img;
     }
 }

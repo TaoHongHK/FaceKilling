@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.facekilling.R;
+import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.util.OkHttpUtils;
 
 import java.io.File;
@@ -106,6 +107,8 @@ public class LoginActivity extends AppCompatActivity {
             public void run() {
                 int result = OkHttpUtils.logIn(email,password);
                 OkHttpUtils.getMainUserInfo(result);
+                if (MainUser.getInstance()!=null)
+                    MainUser.getInstance().setPassword(password);
                 logInHandle.obtainMessage(LOGIN_WHAT,result).sendToTarget();
             }
         }).start();

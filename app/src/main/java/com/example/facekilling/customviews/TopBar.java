@@ -32,6 +32,7 @@ public class TopBar extends LinearLayout {
     private boolean leftButtVisible;
     private float leftButtWidth;
     private float leftButtHeight;
+    private String leftButtText;
 
 
     private int rightTextColor;
@@ -42,6 +43,7 @@ public class TopBar extends LinearLayout {
     private boolean rightButtVisible;
     private float rightButtWidth;
     private float rightButtHeight;
+    private String rightButtText;
 
     private float titleTextSize;
     private int titleTextColor;
@@ -81,6 +83,7 @@ public class TopBar extends LinearLayout {
         //左边按钮
         leftButtIcon = typedArray.getResourceId(R.styleable.TopBar_leftButtIcon,-1);
         leftButtVisible = typedArray.getBoolean(R.styleable.TopBar_leftButtVisible,true);
+        leftButtText = typedArray.getString(R.styleable.TopBar_leftButtText);
         leftButtWidth = typedArray.getDimension(R.styleable.TopBar_leftButtWidth,R.dimen.topbar_butt_width);
         leftButtHeight = typedArray.getDimension(R.styleable.TopBar_leftButtHeight,R.dimen.topbar_butt_height);
 
@@ -95,6 +98,7 @@ public class TopBar extends LinearLayout {
         //右边按钮
         rightButtIcon = typedArray.getResourceId(R.styleable.TopBar_rightButtIcon,-1);
         rightButtVisible = typedArray.getBoolean(R.styleable.TopBar_rightButtVisible,false);
+        rightButtText = typedArray.getString(R.styleable.TopBar_rightButtText);
         rightButtWidth = typedArray.getDimension(R.styleable.TopBar_rightButtWidth,R.dimen.topbar_butt_width);
         rightButtHeight = typedArray.getDimension(R.styleable.TopBar_rightButtHeight,R.dimen.topbar_butt_height);
 
@@ -147,6 +151,9 @@ public class TopBar extends LinearLayout {
                     clickListener.leftClicked();
             }
         });
+        if(null!=leftButtText && leftButtText.equals("")){
+            leftButt.setText(leftButtText);
+        }
 
         rightTv.setTextColor(rightTextColor);
         rightTv.setText(rightText);
@@ -180,6 +187,9 @@ public class TopBar extends LinearLayout {
                 clickListener.rightClicked();
             }
         });
+        if(null!=rightButtText && rightButtText.equals("")){
+            rightButt.setText(rightButtText);
+        }
 
         tvTitle.setText(title);
         if(0 != titleTextColor){

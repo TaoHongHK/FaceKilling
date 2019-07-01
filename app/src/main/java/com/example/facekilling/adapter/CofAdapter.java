@@ -1,7 +1,6 @@
 package com.example.facekilling.adapter;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Gravity;
@@ -21,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,35 +27,27 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.facekilling.R;
-import com.example.facekilling.activities.CofActivity;
-import com.example.facekilling.activities.FaceKCamera;
-import com.example.facekilling.activities.LookForImages;
-import com.example.facekilling.adapter.PictureAdapater;
-import com.example.facekilling.adapter.ReviewAdapter;
+import com.example.facekilling.activities.MyCofActivity;
 import com.example.facekilling.javabean.Cof;
 import com.example.facekilling.javabean.MainUser;
 import com.example.facekilling.javabean.Picture;
 import com.example.facekilling.javabean.Review;
 import com.example.facekilling.javabean.User;
-import com.example.facekilling.util.StaticConstant;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.example.facekilling.util.OkHttpUtils.getMainUserInfo;
-import static com.example.facekilling.util.OkHttpUtils.getEmailById;
-import static com.example.facekilling.util.OkHttpUtils.getUserInfo;
-import static com.example.facekilling.util.OkHttpUtils.postAddFriend;
+import static com.example.facekilling.util.OkHttpUtils.getEmailByIdY;
+import static com.example.facekilling.util.OkHttpUtils.getUserInfoY;
+import static com.example.facekilling.util.OkHttpUtils.postAddFriendY;
+import static com.example.facekilling.util.OkHttpUtils.postLikeCof;
+import static com.example.facekilling.util.OkHttpUtils.postReviewCof;
+import static com.example.facekilling.util.OkHttpUtils.postUnLikeCof;
 
 public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
 
@@ -77,13 +66,11 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
     private String comment = "";
 
 
-    private boolean likeStatus = false;   //false表示没点赞，true表示点赞了
-
-
     static class ViewHolder extends RecyclerView.ViewHolder{
         CardView cardView;
         ImageView headimage;
         TextView head_name;
+        TextView head_date;
         TextView content;
         LinearLayout pictureLinearLayout;
         RecyclerView pictureRecyclerView;
@@ -98,6 +85,7 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
             cardView=(CardView)view;
             headimage = (ImageView) view.findViewById(R.id.cof_item_layout_headimage);
             head_name = (TextView) view.findViewById(R.id.cof_item_layout_head);
+            head_date = (TextView) view.findViewById(R.id.cof_item_layout_date);
             content = (TextView) view.findViewById(R.id.cof_item_layout_content);
             pictureLinearLayout = (LinearLayout) view.findViewById(R.id.cof_item_layout_picture);
             pictureRecyclerView = (RecyclerView) view.findViewById(R.id.cof_item_layout_image) ;
@@ -130,7 +118,7 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                users[0] = getUserInfo(cof.getUserId());
+                users[0] = getUserInfoY(cof.getUserId());
             }
         });
         thread.start();
@@ -143,11 +131,10 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
             e.printStackTrace();
         }
 
-        //方便测试
         holder.headimage.setImageBitmap(users[0].getImageBitMap());
         holder.head_name.setText(users[0].getUser_name());
 
-
+        holder.head_date.setText(cof.getDate());
         holder.content.setText(cof.getContent());
 
         LinearLayout linearLayout = holder.pictureLinearLayout;
@@ -179,15 +166,30 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
 
         recyclerView.setAdapter(adapter);
 
-
-
+        //设置点赞
+        if(cof.getLike_ids().contains(MainUser.getInstance().getUser_id())){
+            cof.setLikeStatus(true);
+            cof.setUserLikeStatus(true);
+        }
+        else{
+            cof.setLikeStatus(false);
+            cof.setUserLikeStatus(false);
+        }
+        if(cof.isUserLikeStatus()) {
+            holder.like_button.setBackgroundResource(R.drawable.like_press);
+        }
+        else{
+            holder.like_button.setBackgroundResource(R.drawable.like);
+        }
         String string = cof.getPraise_num() + "  人点赞";
         holder.like_num.setText(string);
 
         List<Review> reviewList = new ArrayList<>();
         reviewList.addAll(cof.getReviewList());
-        ReviewAdapter reviewAdapter = new ReviewAdapter(mContext,R.layout.review_item,reviewList);
+        //TODO 帖子与评论不匹配
+        ReviewAdapter reviewAdapter = new ReviewAdapter(mContext,R.layout.review_item,reviewList,cof.getUserId(),cof.getCof_id());
         ListView listView = holder.listView;
+
 
         int totalHeight = 20;
         for (int i = 0, len = reviewAdapter.getCount(); i < len; i++) { // listAdapter.getCount()返回数据项的数目
@@ -217,26 +219,40 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
         final TextView like_num = holder.like_num;
         ImageView headimage = holder.headimage;
 
+
+
         //点赞事件
         like_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                if(likeStatus){
-                    //TODO 点赞，往服务器传送点赞的消息
+                if(cof.isLikeStatus()){
                     like_button.setBackgroundResource(R.drawable.like);
-                    likeStatus = false;
-                    //TODO 根据position cof_id从服务器获取点赞数并刷新
-                    int num = 0;
+                    cof.setLikeStatus(false);
+                    int num;
+                    if(cof.isUserLikeStatus()){
+                        num = cof.getPraise_num() - 1;
+                    }
+                    else{
+                        num = cof.getPraise_num();
+                    }
+
                     String string = num + "  人点赞";
                     like_num.setText(string);
+                    postUnLikeCof(cof.getCof_id(),cof.getUserId());
                 }
                 else{
-                    //TODO 取消点赞，往服务器传送取消点赞的消息
                     like_button.setBackgroundResource(R.drawable.like_press);
-                    likeStatus = true;
-                    //TODO 根据position cof_id从服务器获取点赞数并刷新
-                    int num = 0;
+                    cof.setLikeStatus(true);
+                    int num;
+                    if(cof.isUserLikeStatus()){
+                        num = cof.getPraise_num();
+                    }
+                    else{
+                        num = cof.getPraise_num()+1;
+                    }
                     String string = num + "  人点赞";
                     like_num.setText(string);
+                    postLikeCof(cof.getCof_id(),cof.getUserId());
+
                 }
 
             }
@@ -245,19 +261,20 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
         final int index = position;
         review_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                showPopupcomment();
+                showPopupcomment(cof);
                 commentIndex = index;
             }
         });
+
+
 
         headimage.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
-                //TODO 弹出添加好友的警告框
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                 //    指定下拉列表的显示数
-                final String[] cities = {"添加好友"};
+                final String[] cities = {"添加好友","进入这位朋友的社区"};
                 //    设置一个下拉的列表选择项
                 builder.setItems(cities, new DialogInterface.OnClickListener()
                 {
@@ -268,49 +285,12 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
                             case 0:
                                 //添加好友
                                 final int user_id = cof.getUserId();
-                                final String[] emails = {null};
-                                Thread thread = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        emails[0] = getEmailById(user_id);
-                                    }
-                                });
-                                thread.start();
-                                try
-                                {
-                                    thread.join();
-                                }
-                                catch (InterruptedException e)
-                                {
-                                    e.printStackTrace();
-                                }
+                                String email = getEmailByIdY(user_id);
+                                int error = postAddFriendY(MainUser.getInstance(),email);
 
-
-                                final int[] errors = {-1};
-                                Thread athread = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            errors[0] = postAddFriend(MainUser.getInstance(),emails[0]);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                });
-                                athread.start();
-                                try
-                                {
-                                    athread.join();
-                                }
-                                catch (InterruptedException e)
-                                {
-                                    e.printStackTrace();
-                                }
                                 AlertDialog.Builder errorBuider = new AlertDialog.Builder(mContext);
                                 errorBuider.setTitle("     温馨提示");
-                                switch (errors[0]){
+                                switch (error){
                                     case 0:
                                         errorBuider.setMessage("好友添加成功");
                                         break;
@@ -322,6 +302,12 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
                                         break;
                                 }
                                 errorBuider.show();
+                                break;
+                            case 1:
+                                Intent intent = new Intent(mContext, MyCofActivity.class);
+                                intent.putExtra("cofUserId",cof.getUserId());
+                                mContext.startActivity(intent);
+                                break;
                         }
                     }
                 });
@@ -335,7 +321,7 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
 
 
     @SuppressLint("WrongConstant")
-    private void showPopupcomment() {
+    private void showPopupcomment(final Cof cof) {
         if (popupView == null){
             //加载评论框的资源文件
             popupView = LayoutInflater.from(mContext).inflate(R.layout.comment_popupwindow, null);
@@ -423,11 +409,12 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
                 popupWindow.dismiss();
                 //
                 comment += nInputContentText;
-                //TODO 评论，往服务器添加评论
+
                 Review review = new Review(MainUser.getInstance().getUser_id(),comment);
-                Cof cof = mCofList.get(commentIndex);
-                cof.getReviewList().add(review);
+                Cof newcof = mCofList.get(commentIndex);
+                newcof.getReviewList().add(review);
                 notifyDataSetChanged();
+                postReviewCof(cof.getCof_id(),cof.getUserId(),comment);
 
             }
         });

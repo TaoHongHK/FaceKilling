@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
@@ -72,8 +73,6 @@ public class AddFriendsActivity extends AppCompatActivity {
                                 OkHttpUtils.postAddFriend(MainUser.getInstance(),email)).sendToTarget(); ;
                     }catch (IOException ie){
                         ie.printStackTrace();
-                    }catch (JSONException je){
-                        je.printStackTrace();
                     }
                 }
             }

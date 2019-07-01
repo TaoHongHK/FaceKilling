@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +33,12 @@ import com.example.facekilling.javabean.Review;
 import com.example.facekilling.javabean.User;
 
 
+import org.json.JSONException;
+
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,35 +46,16 @@ import java.util.Random;
 import static android.content.Intent.getIntent;
 import static com.example.facekilling.util.GetBitmap.getBaseFilePath;
 import static com.example.facekilling.util.GetBitmap.getBitmapFromSD;
+import static com.example.facekilling.util.OkHttpUtils.getCofList;
 
 public class Index_ThreeFragment extends Fragment {
 
     private View mView;
     private TopBar topBar;
     private DrawerLayout drawerLayout;
+    private RecyclerView mRecyclerView;
 
-
-    private List<Cof> myCofList = new ArrayList<>();
-
-
-
-//    private Cof[] cofs = {
-//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试1"),
-//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试2"),
-//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试3"),
-//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试4"),
-//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试5"),
-//            new Cof(MainUser.getInstance().getUser_id(),"这是一个测试6"),
-//    };
-    private Cof[] cofs = {
-            new Cof(2,"这是一个测试1"),
-            new Cof(2,"这是一个测试2"),
-            new Cof(2,"这是一个测试3"),
-            new Cof(2,"这是一个测试4"),
-            new Cof(2,"这是一个测试5"),
-            new Cof(2,"这是一个测试6"),
-    };
-
+    private int nowPosition;
 
 
     private List<Cof> cofList = new ArrayList<>();
@@ -91,8 +77,11 @@ public class Index_ThreeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_index_three,container,false);
         initCofs();
-        initView();
         //各种监控事件
+        monitorMain();
+        initView();
+        if(cofList.size() == 0) return mView;
+
         monitor();
         return mView;
     }
@@ -122,15 +111,15 @@ public class Index_ThreeFragment extends Fragment {
         if(newCof != null){
             cofList.add(0,newCof);
         }
-        RecyclerView recyclerView = (RecyclerView) mView.findViewById(R.id.cof_recycler_view);
+        mRecyclerView = (RecyclerView) mView.findViewById(R.id.cof_recycler_view);
         GridLayoutManager layoutManger = new GridLayoutManager(getActivity(),1);
         layoutManger.setAutoMeasureEnabled(true);
-        recyclerView.setLayoutManager(layoutManger);
-        recyclerView.setAdapter(cofadapter);
+        mRecyclerView.setLayoutManager(layoutManger);
+        mRecyclerView.setAdapter(cofadapter);
 
 
     }
-    private void monitor(){
+    private void monitorMain(){
         topBar = (TopBar) mView.findViewById(R.id.cofTopBar);
         topBar.setClickListener(new TopBar.TopbarClickListener() {
             @Override
@@ -151,34 +140,65 @@ public class Index_ThreeFragment extends Fragment {
         head_img.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent intent = new Intent(getActivity(),MyCofActivity.class);
+                intent.putExtra("cofUserId",MainUser.getInstance().getUser_id());
                 startActivity(intent);
             }
         });
+    }
+    private void monitor(){
 
 
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            //判断是不是往上拖动
+            public boolean isLastReflash;
 
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                /*
+                 * 滑动停止之后检测是否滑动到底部
+                 * */
+                if(newState == RecyclerView.SCROLL_STATE_IDLE &&isLastReflash){
+                    if(mRecyclerView.computeVerticalScrollExtent()+recyclerView.computeVerticalScrollOffset()>=recyclerView.computeVerticalScrollRange()){
+                        // Toast.makeText(getContext(),"滑动到底部",Toast.LENGTH_SHORT).show();
+                        //滑动到底部的时候一般要做加载更多的数据的操作...
+                        loadMoreCof(nowPosition);
+                        cofadapter.notifyDataSetChanged();
+                        Log.d("OKHTTP", "onScrollStateChanged: "+nowPosition);
+                    }
+                }
+            }
+            //根据dy，dx可以判断是往哪个方向滑动
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy>0){
+                    isLastReflash = true;
+                }else{
+                    isLastReflash = false;
+                }
+            }
+        });
 
     }
     private void initCofs(){
-        //TODO:写一个从服务器端获取所有cof的函数
         cofList.clear();
-        //测试
-        Review review = new Review(MainUser.getInstance().getUser_id(),"评论测试");
-        List<Review> reviewList = new ArrayList<>();
-        reviewList.add(review);
-        String path = getBaseFilePath("5") + File.separator + "20190628021926.jpg";
-        Bitmap bitmap = getBitmapFromSD(path);
-        Picture picture = new Picture(bitmap,path);
-        List<Picture> pictureList = new ArrayList<>();
-        pictureList.add(picture);
-
-        for(int i=0;i<10;i++){
-            Random random = new Random();
-            int index =  random.nextInt(cofs.length);
-            cofs[index].setImagesList(pictureList);
-            cofs[index].setReviewList(reviewList);
-            cofList.add(cofs[index]);
+        List<Cof> newCofList = new ArrayList<>();
+        try {
+            List<Cof> cofList = getCofList(-1,0);
+            newCofList.addAll(cofList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+        cofList.addAll(newCofList);
+        cofadapter.notifyDataSetChanged();
+        nowPosition = cofList.size();
+
     }
 
     private void refreshCofs(){
@@ -203,5 +223,22 @@ public class Index_ThreeFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         newCof = ((IndexActivity) activity).getCof();
+    }
+
+    public void loadMoreCof(int index){
+        List<Cof> newCofList = new ArrayList<>();
+        try {
+            List<Cof> cofList = getCofList(-1,index);
+            newCofList.addAll(cofList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        cofList.addAll(newCofList);
+        cofadapter.notifyDataSetChanged();
+        nowPosition = cofList.size();
     }
 }

@@ -2,6 +2,7 @@ package com.example.facekilling.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import com.example.facekilling.R;
 import com.example.facekilling.activities.AddFriendsActivity;
 import com.example.facekilling.customviews.TopBar;
+import com.example.facekilling.util.GetBitmap;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -44,6 +46,7 @@ public class Index_TwoFragment extends Fragment {
     private TextView friTv;
     private TextView chatTv;
     private SparseArray<Fragment> fragments = new SparseArray<>();
+    private int last_id = -1;
 
     private MyStatePageAdapter myStatePageAdapter;
 
@@ -133,13 +136,18 @@ public class Index_TwoFragment extends Fragment {
 
             }
         });
+
         fri_viewPagerFragment.setItemClickListener(new Fri_ViewPagerFragment.ItemClickListener() {
             @Override
-            public void onItemClicked(String userName,int id) {
-                fragments.remove(fragments.size()-1);
-                fragments.put(1,Chat_ViewPagerFragment.newInstance(userName,id));
-                myStatePageAdapter.notifyDataSetChanged();
-                swichViewPage(1);
+            public void onItemClicked(String userName, int id) {
+                if(last_id!=id){
+                    fragments.get(1).onDestroy();
+                    fragments.remove(1);
+                    fragments.put(1,Chat_ViewPagerFragment.newInstance(userName,id));
+                    myStatePageAdapter.notifyDataSetChanged();
+                    swichViewPage(1);
+                    last_id = id;
+                }else swichViewPage(1);
             }
         });
         mViewPager.setAdapter(myStatePageAdapter);
@@ -158,8 +166,6 @@ public class Index_TwoFragment extends Fragment {
                 // 开始扫描
                 intentIntegrator.initiateScan();
                 //扫描结果
-
-
                 break;
             case R.id.produce_erweima:
                 //生成我的二维码

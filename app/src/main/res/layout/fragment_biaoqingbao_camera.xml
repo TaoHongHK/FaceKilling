@@ -1,19 +1,63 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/biaoqingbao_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/biaoqingbao_oneMoreButt"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/cameraoneMore"
-        android:background="@drawable/shape_post"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"/>
-</RelativeLayout>
+        android:orientation="vertical">
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="380dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="10dp"
+            app:cardCornerRadius="10dp">
+            <ImageView
+                android:id="@+id/biaoqingbao_img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/picture_02"/>
+        </android.support.v7.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp">
+            <ImageView
+                android:id="@+id/reviewImg"
+                android:layout_width="@dimen/face_item_img_size"
+                android:layout_height="@dimen/face_item_img_size"
+                android:src="@drawable/emoji_surprise"/>
+            <TextView
+                android:id="@+id/reviewContent"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/face_item_img_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:paddingTop="5dp"
+                android:textSize="20sp"
+                android:textColor="#000"
+                android:textStyle="bold"
+                android:text="未知"/>
+        </LinearLayout>
+        <Button
+            android:id="@+id/biaoqingbao_oneMoreButt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cameraoneMore"
+            android:background="@drawable/shape_post"
+            android:layout_gravity="center"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"/>
+    </LinearLayout>
+
+
+
+</ScrollView>
+
+
