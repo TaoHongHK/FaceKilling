@@ -12,9 +12,10 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
-        <ImageView android:src="@drawable/show_fire_center"
+        <pl.droidsonroids.gif.GifImageView
+            android:src="@drawable/show_fire_center"
             android:layout_width="wrap_content"
-            android:layout_height="72dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="80dp"
             android:layout_gravity="center_horizontal" />
 

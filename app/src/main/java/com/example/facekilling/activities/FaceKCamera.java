@@ -205,7 +205,7 @@ public class FaceKCamera extends AppCompatActivity {
 
     private void initBackCamera() {
         mCamera = Camera.open(backCameraId);//默认开启后置
-        mCamera.setDisplayOrientation(270);//摄像头进行旋转90°
+        mCamera.setDisplayOrientation(90);//摄像头进行旋转90°
         if (mCamera != null) {
             try {
                 Camera.Parameters parameters = mCamera.getParameters();

@@ -52,6 +52,34 @@ public class YanZhiCameraActivity extends Activity {
     private TextView faceFat;
     private TextView faceScore;
 
+    private static final String EYE_GLASSES = "eyeglasses";
+    private static final String EYE_RESULT_TURE = "戴眼镜";
+    private static final String EYE_RESULT_FALSE = "无眼镜";
+
+    private static final String BEARD = "bread";
+    private static final String BEARD_RESULT_TURE = "有胡子";
+    private static final String BEARD_RESULT_FALSE = "无胡子";
+
+    private static final String CHUBBY = "chubby";
+    private static final String CHUBBY_RESULT_TURE = "圆润";
+    private static final String CHUBBY_RESULT_FALSE = "苗条";
+
+    private static final String HAIR_SHAPE = "straight_hair";
+    private static final String HAIR_SHAPE_RESULT_TURE = "直发";
+    private static final String HAIR_SHAPE_RESULT_FALSE = "卷发";
+
+    private static final String HAT = "hat";
+    private static final String HAT_RESULT_TURE = "戴帽子";
+    private static final String HAT_RESULT_FALSE = "无帽子";
+
+    private static final String MAKE_UP = "makeup";
+    private static final String MAKE_UP_RESULT_TURE = "化妆";
+    private static final String MAKE_UP_RESULT_FALSE = "素颜";
+
+    private static final String SEX = "male";
+    private static final String SEX_RESULT_TURE = "男性";
+    private static final String SEX_RESULT_FALSE = "女性";
+
 
     private static final String UNKNOWN = "未知";
 
@@ -127,14 +155,35 @@ public class YanZhiCameraActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    faceGlasses.setText(face.getEyeglasses());
-                    faceFat.setText(face.getChubby());
-                    faceGender.setText(face.getSex());
-                    faceHairstyle.setText(face.getHair_shape());
-                    faceMakeup.setText(face.getMakeup());
+                    if (face.getEyeglasses().equals(EYE_GLASSES))
+                        faceGlasses.setText(EYE_RESULT_TURE);
+                    else faceGlasses.setText(EYE_RESULT_FALSE);
+
+                    if (face.getChubby().equals(CHUBBY))
+                        faceFat.setText(CHUBBY_RESULT_TURE);
+                    else faceFat.setText(CHUBBY_RESULT_FALSE);
+
+                    if (face.getSex().equals(SEX))
+                        faceGender.setText(SEX_RESULT_TURE);
+                    else faceGender.setText(SEX_RESULT_FALSE);
+
+                    if (face.getHair_shape().equals(HAIR_SHAPE))
+                        faceHairstyle.setText(HAIR_SHAPE_RESULT_TURE);
+                    else faceHairstyle.setText(HAIR_SHAPE_RESULT_FALSE);
+
+                    if (face.getMakeup().equals(MAKE_UP))
+                        faceMakeup.setText(MAKE_UP_RESULT_TURE);
+                    else faceMakeup.setText(MAKE_UP_RESULT_FALSE);
+
+                    if (face.getBeard().equals(BEARD))
+                        faceMoustache.setText(BEARD_RESULT_TURE);
+                    else faceMoustache.setText(BEARD_RESULT_FALSE);
+
+                    if (face.getHat().equals(HAT))
+                        faceHat.setText(HAT_RESULT_TURE);
+                    else faceHat.setText(HAT_RESULT_FALSE);
+
                     faceScore.setText(face.getAttra_score());
-                    faceMoustache.setText(face.getBeard());
-                    faceHat.setText(face.getHat());
                 }
             });
         }
