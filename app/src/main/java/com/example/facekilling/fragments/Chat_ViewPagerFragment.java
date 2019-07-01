@@ -110,7 +110,7 @@ public class Chat_ViewPagerFragment extends Fragment {
                 while (true){
                     try {
                         reveiveMsg();
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
                     } catch (InterruptedException ine){
                         ine.printStackTrace();
                     }
@@ -171,6 +171,7 @@ public class Chat_ViewPagerFragment extends Fragment {
                         list.add(new ChatMessage(sendMsg.getText().toString(), MainUser.getInstance().getImageBitMap(), ChatMessage.TYPE_SEND));
                         chatMessageAdapter.notifyItemInserted(list.size() - 1);
                         sendMsg.setText("");
+                        recyclerView.scrollToPosition(list.size() - 1);
                     }
                 }
                 break;
@@ -181,6 +182,7 @@ public class Chat_ViewPagerFragment extends Fragment {
                             list.add(new ChatMessage(friendInformation.getInformation(),friend.getImageBitMap(),
                                     ChatMessage.TYPE_RECEIVE));
                             chatMessageAdapter.notifyItemInserted(list.size() - 1);
+                            recyclerView.scrollToPosition(list.size() - 1);
                         }
                     }
                 }
