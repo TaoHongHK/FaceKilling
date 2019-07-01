@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import static com.example.facekilling.util.OkHttpUtils.getUserInfoY;
+
 public class JsonUtil {
 
 
@@ -143,7 +145,7 @@ public class JsonUtil {
         int num = json.getInt("num");
         for(int i=0;i<num;i++){
             JSONObject jsonCof = jsonCofArray.getJSONObject(i);
-            int cof_id = jsonCof.getInt("id");
+            final int cof_id = jsonCof.getInt("id");
             int userId = jsonCof.getInt("user_id");
             String dateString = jsonCof.getString("dateTime");
             //内容
@@ -187,8 +189,26 @@ public class JsonUtil {
                 }
             }
 
-            Cof cof = new Cof(userId,content,dateString,pictureList,like_num,like_ids,reviewList);
+            final Cof cof = new Cof(userId,content,dateString,pictureList,like_num,like_ids,reviewList);
             cof.setCof_id(cof_id);
+            final User[] users = {null};
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    users[0] = getUserInfoY(cof.getUserId());
+                }
+            });
+            thread.start();
+            try
+            {
+                thread.join();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+            cof.setUser(users[0]);
             cofList.add(cof);
         }
         return cofList;

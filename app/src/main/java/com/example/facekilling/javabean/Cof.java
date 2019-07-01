@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Cof implements Serializable {
+    private User user;
     private int userId;
     private String content;      //发表的内容
     private String date;           //发表的时间
@@ -106,5 +107,13 @@ public class Cof implements Serializable {
 
     public void setLikeStatus(boolean likeStatus) {
         this.likeStatus = likeStatus;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

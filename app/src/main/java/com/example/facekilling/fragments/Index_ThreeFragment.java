@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -81,7 +83,6 @@ public class Index_ThreeFragment extends Fragment {
         monitorMain();
         initView();
         if(cofList.size() == 0) return mView;
-
         monitor();
         return mView;
     }
@@ -116,6 +117,7 @@ public class Index_ThreeFragment extends Fragment {
         layoutManger.setAutoMeasureEnabled(true);
         mRecyclerView.setLayoutManager(layoutManger);
         mRecyclerView.setAdapter(cofadapter);
+
 
 
     }
@@ -241,4 +243,5 @@ public class Index_ThreeFragment extends Fragment {
         cofadapter.notifyDataSetChanged();
         nowPosition = cofList.size();
     }
+
 }

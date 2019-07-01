@@ -45,6 +45,7 @@ import java.util.TimerTask;
 import static com.example.facekilling.util.OkHttpUtils.getEmailByIdY;
 import static com.example.facekilling.util.OkHttpUtils.getUserInfoY;
 import static com.example.facekilling.util.OkHttpUtils.postAddFriendY;
+import static com.example.facekilling.util.OkHttpUtils.postDeleteCof;
 import static com.example.facekilling.util.OkHttpUtils.postLikeCof;
 import static com.example.facekilling.util.OkHttpUtils.postReviewCof;
 import static com.example.facekilling.util.OkHttpUtils.postUnLikeCof;
@@ -79,6 +80,7 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
         Button review_button;
         TextView like_num;
         ListView listView;
+        Button cof_delete;
 
         public ViewHolder(View view){
             super(view);
@@ -93,6 +95,7 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
             review_button = (Button) view.findViewById(R.id.cof_item_layout_review);
             like_num = (TextView) view.findViewById(R.id.cof_item_layout_like_num);
             listView = (ListView) view.findViewById(R.id.review_recycler_view);
+            cof_delete = (Button) view.findViewById(R.id.cof_item_delete);
         }
     }
 
@@ -114,25 +117,9 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
     public void onBindViewHolder(@NonNull CofAdapter.ViewHolder holder, int position) {
         final CofAdapter.ViewHolder tmpHolder = holder;
         final Cof cof = mCofList.get(position);
-        final User[] users = {null};
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                users[0] = getUserInfoY(cof.getUserId());
-            }
-        });
-        thread.start();
-        try
-        {
-            thread.join();
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
 
-        holder.headimage.setImageBitmap(users[0].getImageBitMap());
-        holder.head_name.setText(users[0].getUser_name());
+        holder.headimage.setImageBitmap(cof.getUser().getImageBitMap());
+        holder.head_name.setText(cof.getUser().getUser_name());
 
         holder.head_date.setText(cof.getDate());
         holder.content.setText(cof.getContent());
@@ -142,6 +129,7 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
         StaggeredGridLayoutManager layoutManager = new
                 StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
+
 
 
         //设置高度自适应
@@ -219,8 +207,18 @@ public class CofAdapter extends RecyclerView.Adapter<CofAdapter.ViewHolder>{
         final TextView like_num = holder.like_num;
         ImageView headimage = holder.headimage;
 
+        //删除
+        holder.cof_delete.setOnClickListener(new View.OnClickListener(){
 
-
+            @Override
+            public void onClick(View view) {
+                if(cof.getUserId() == MainUser.getInstance().getUser_id()){
+                    postDeleteCof(cof.getCof_id(),cof.getUserId());
+                    mCofList.remove(cof);
+                    notifyDataSetChanged();
+                }
+            }
+        });
         //点赞事件
         like_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){

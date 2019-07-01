@@ -174,23 +174,9 @@ public class FaceKCamera extends AppCompatActivity {
         }
     }
 
-    public void parameters(Camera camera) {
-        List<Camera.Size> pictureSizes = camera.getParameters().getSupportedPictureSizes();
-        List<Camera.Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
-        Camera.Size psize;
-        for (int i = 0; i < pictureSizes.size(); i++) {
-            psize = pictureSizes.get(i);
-            Log.i("pictureSize",psize.width+" x "+psize.height);
-        }
-        for (int i = 0; i < previewSizes.size(); i++) {
-            psize = previewSizes.get(i);
-            Log.i("previewSize",psize.width+" x "+psize.height);
-        }
-    }
 
     private void initFrontCamera() {
         mCamera = Camera.open(frontCameraId);//默认开启后置
-        parameters(mCamera);
         mCamera.setDisplayOrientation(90);//摄像头进行旋转90°
         if (mCamera != null) {
             try {
@@ -263,7 +249,6 @@ public class FaceKCamera extends AppCompatActivity {
     }
 
     public void takePicture(){
-        Log.d("timeTest", "run: 开始拍照"+GetSysTime.getCurrTime());
         if (mCamera==null){
             return;
         }
@@ -286,7 +271,6 @@ public class FaceKCamera extends AppCompatActivity {
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0,
                     resource.getWidth(), resource.getHeight(), matrix, true);
             if (bitmap != null) {
-                Log.d("timeTest", "run: 开始保存图片"+GetSysTime.getCurrTime());
                 saveTempPic(bitmap);
                 savePic(bitmap);
             }
@@ -338,7 +322,6 @@ public class FaceKCamera extends AppCompatActivity {
                     MediaStore.Images.Media.insertImage(getContentResolver(), picFile.getPath(), pickName, "description");
                     Uri uri = Uri.fromFile(picFile);
                     sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
-                    Log.d("timeTest", "run: 已保存图片 "+GetSysTime.getCurrTime());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } finally {
@@ -407,14 +390,10 @@ public class FaceKCamera extends AppCompatActivity {
         public void handleMessage(Message msg) {
             if(msg.what==CAMERA_WHAT){
                 bitmapPath = (String) msg.obj;
-                Log.i("Mlogin",bitmapPath);
                 if (bitmapPath!=null){
                     faceKCamera.setBitmapPath(bitmapPath);
-                    Log.d("timeTest", "run: 开始改变界面"+GetSysTime.getCurrTime());
                     changeShowingViews();
-                    Log.d("timeTest", "run: 界面变化完毕 "+GetSysTime.getCurrTime());
                     iv_show.setImageBitmap(GetBitmap.getBitmapFromSD(bitmapPath));
-                    Log.d("timeTest", "run: 设置图片 "+GetSysTime.getCurrTime());
                 }
             }
         }

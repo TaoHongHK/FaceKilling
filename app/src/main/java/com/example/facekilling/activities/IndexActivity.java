@@ -152,7 +152,8 @@ public class IndexActivity extends AppCompatActivity {
         //监控侧边栏头像
         View navHeaderView = navigationView.getHeaderView(0);
         CircleImageView cirIViewHead = (CircleImageView) navHeaderView.findViewById(R.id.avatar_img);
-        cirIViewHead.setImageBitmap(MainUser.getInstance().getImageBitMap());
+        if (MainUser.getInstance()!=null)
+            cirIViewHead.setImageBitmap(MainUser.getInstance().getImageBitMap());
         TextView mail = (TextView) navHeaderView.findViewById(R.id.mail);
         mail.setText(MainUser.getInstance().getEmail());
         TextView user_name = (TextView) navHeaderView.findViewById(R.id.username);
@@ -177,6 +178,11 @@ public class IndexActivity extends AppCompatActivity {
                     case R.id.nav_pictures:
                         drawerLayout.closeDrawers();
                         enterPictures();
+                        break;
+                    case R.id.nav_logout:
+                        Intent intent = new Intent(getContext(),LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                         break;
                     default:
                         drawerLayout.closeDrawers();

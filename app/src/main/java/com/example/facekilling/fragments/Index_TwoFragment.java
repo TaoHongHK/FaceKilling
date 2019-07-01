@@ -53,7 +53,6 @@ public class Index_TwoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("index2", "onCreate: ");
     }
 
     @Nullable
@@ -62,7 +61,6 @@ public class Index_TwoFragment extends Fragment {
         mContext = getActivity();
         mView = inflater.inflate(R.layout.fragment_index__two,container,false);
         initView();
-        Log.d("index2", "onCreateView: ");
         return mView;
     }
 

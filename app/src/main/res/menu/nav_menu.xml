@@ -9,5 +9,9 @@
             android:id="@+id/nav_pictures"
             android:icon="@drawable/pictures_menu"
             android:title="pictures" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/power_menu"
+            android:title="log out" />
     </group>
 </menu>

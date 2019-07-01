@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.facekilling.R;
@@ -23,6 +24,9 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.List;
 
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
+
 
 public class BiaoQingBaoCameraActivity extends Activity {
 
@@ -33,6 +37,9 @@ public class BiaoQingBaoCameraActivity extends Activity {
     private ImageView reviewImg;
     private TextView reviewContent;
     private int biaoQingIndex = 0;
+    private GifImageView gifImageView;
+    private GifDrawable gifDrawable;
+    private LinearLayout linearLayout;
     private final String[] review = {"你太棒了","还要继续努力哦"};
     private final String[] biaoQingText = {"amazing", "happy", "angry", "nature"};
     private final int[] biaoQingImg = {R.drawable.emoji_surprise,R.drawable.emoji_happy,R.drawable.emoji_angry,R.drawable.emoji_nature};
@@ -52,6 +59,8 @@ public class BiaoQingBaoCameraActivity extends Activity {
         imageView = (ImageView) findViewById(R.id.biaoqingbao_img);
         reviewImg = (ImageView) findViewById(R.id.reviewImg);
         reviewContent = (TextView) findViewById(R.id.reviewContent);
+        gifImageView = (GifImageView) findViewById(R.id.biaoqingbao_gif);
+        linearLayout = (LinearLayout) findViewById(R.id.biaoqingbao_info_part);
         oneMoreButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,6 +70,10 @@ public class BiaoQingBaoCameraActivity extends Activity {
 
             }
         });
+        gifImageView.setVisibility(View.VISIBLE);
+        linearLayout.setVisibility(View.GONE);
+        gifDrawable = (GifDrawable) gifImageView.getDrawable();
+        gifDrawable.start();
     }
 
     @Override
@@ -119,6 +132,9 @@ public class BiaoQingBaoCameraActivity extends Activity {
                 }
             });
         }
+        gifDrawable.stop();
+        linearLayout.setVisibility(View.VISIBLE);
+        gifImageView.setVisibility(View.GONE);
     }
 
     private class BiaoQingBaoCallBackHandle extends Handler {

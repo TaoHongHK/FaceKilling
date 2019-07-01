@@ -2,6 +2,7 @@ package com.example.facekilling.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,9 +11,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.facekilling.R;
 import com.example.facekilling.javabean.Face;
 import com.example.facekilling.javabean.MainUser;
@@ -25,11 +28,18 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.List;
 
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
+
 
 public class YanZhiCameraActivity extends Activity {
 
     private ImageView imageView;
     private Button oneMoreButt;
+    private GifImageView wait_gif;
+    private GifDrawable gifDrawable;
+    private LinearLayout linearLayout;
+
     private static final int YANZHIWHAT = 0;
     private YanZhiCallBackHandle yanZhiCallBackHandle;
 
@@ -42,6 +52,9 @@ public class YanZhiCameraActivity extends Activity {
     private TextView faceFat;
     private TextView faceScore;
 
+
+    private static final String UNKNOWN = "未知";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,11 +62,12 @@ public class YanZhiCameraActivity extends Activity {
         Intent intent = new Intent(getApplicationContext(),FaceKCamera.class);
         startActivityForResult(intent, StaticConstant.CAMERA_RETURN);
         yanZhiCallBackHandle = new YanZhiCallBackHandle(this);
-        Log.d("yanzhi", "onCreate: ");
     }
 
     public void initView(){
+        linearLayout = (LinearLayout) findViewById(R.id.yanzhi_info_part);
         imageView = (ImageView) findViewById(R.id.yanzhi_img);
+        wait_gif = (GifImageView) findViewById(R.id.yanzhi_gif);
         oneMoreButt = (Button) findViewById(R.id.yanzhi_oneMoreButt);
         faceGlasses = (TextView) findViewById(R.id.face_glasses_text);
         faceHat = (TextView) findViewById(R.id.face_hat_text);
@@ -70,6 +84,10 @@ public class YanZhiCameraActivity extends Activity {
                 startActivityForResult(intent, StaticConstant.CAMERA_RETURN);
             }
         });
+        linearLayout.setVisibility(View.GONE);
+        wait_gif.setVisibility(View.VISIBLE);
+        gifDrawable = (GifDrawable) wait_gif.getDrawable();
+        gifDrawable.start();
     }
 
     @Override
@@ -103,6 +121,9 @@ public class YanZhiCameraActivity extends Activity {
 
     public void setFaceText(final Face face){
         if(face!=null){
+            gifDrawable.stop();
+            wait_gif.setVisibility(View.GONE);
+            linearLayout.setVisibility(View.VISIBLE);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -118,9 +139,20 @@ public class YanZhiCameraActivity extends Activity {
             });
         }
         else{
+            gifDrawable.stop();
+            wait_gif.setVisibility(View.GONE);
+            linearLayout.setVisibility(View.VISIBLE);
             Toast toast = Toast.makeText(getApplicationContext(),"没有检测到人脸，哈哈",Toast.LENGTH_LONG);
             toast.setGravity(Gravity.TOP,0,0);
             toast.show();
+            faceGlasses.setText(UNKNOWN);
+            faceFat.setText(UNKNOWN);
+            faceGender.setText(UNKNOWN);
+            faceHairstyle.setText(UNKNOWN);
+            faceMakeup.setText(UNKNOWN);
+            faceScore.setText(UNKNOWN);
+            faceMoustache.setText(UNKNOWN);
+            faceHat.setText(UNKNOWN);
         }
     }
 
